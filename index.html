@@ -63,7 +63,8 @@ s4tObj=processS4Tarray(s4tTerms);
 </script>
 
 <style type="text/css">
-body { font-family: Verdana;}
+body { font-family: Verdana; }
+h1 {text-align: center;}
 tr.transportTaskInfo { background-color: #FFCCCC;}
 tr.shippingAddress { background-color: #FFFFCC;}
 tr.deliveryInstructions { background-color: #CCFFCC;}
@@ -72,34 +73,37 @@ tr.freightUnitInformation { background-color: #CCFFFF;}
 div#gs1DigitalLink {position: absolute; left: 50vw; top: 100px; width: 45vw;}
 div#qrCode {position: absolute; left: 50vw; top: 350px; width: 45vw;}
 textarea#dlOutput { width: 100%; font-size: 1em; height: 160px;}
+td.s4tCode {text-align: center;}
+input.maxWidth {width: 100%;}
+img#qrCode {position: relative; left: calc(22.5vw - 175px);}
 </style>
 </head>
 <body>
 <div id="app1">
 <h1>Scan4Transport Interactive Demo</h1>
 
-<p>By entering data in the form below, a GS1 Digital Link URI can be constructed, in which the Scan4Transport data is encoded in the URI query string, using the proposed short codes as URI query string keys.</p>
-
+<p>Enter data in the form below to generate a GS1 Digital Link URI and corresponding QR code.</p>
 
 <table>
 <tbody>
-<tr><td>SSCC</td><td><input type="text" v-model="sscc"></td></tr>
-<tr><td>URI stem</td><td><input type="text" v-model="uriStem"></td></tr>
+<tr><td title="Serial Shipping Container Code">SSCC</td><td colspan="2"><input class="maxWidth" type="text" v-model="sscc" pattern="[0-9]{18}"></td><td></td></tr>
+<tr><td>URI stem</td><td colspan="4"><input class="maxWidth" type="text" v-model="uriStem"></td></tr>
+<tr><td></td><td></td><td></td><td>S4T Code</td></tr>
 </tbody>
 <tbody v-for="ex in transportTaskInformation">
-<tr class="transportTaskInfo"><td  v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td></tr>
+<tr class="transportTaskInfo"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 </tbody>
 <tbody v-for="ex in freightUnitInformation">
-<tr class="freightUnitInformation"><td  v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td></tr>
+<tr class="freightUnitInformation"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 </tbody>
 <tbody v-for="ex in shippingAddressInfo">
-<tr class="shippingAddress"><td  v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td></tr>
+<tr class="shippingAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 </tbody>
 <tbody v-for="ex in deliveryInstructions">
-<tr class="deliveryInstructions"><td  v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td></tr>
+<tr class="deliveryInstructions"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 </tbody>
 <tbody v-for="ex in returnAddressInfo">
-<tr class="returnAddress"><td  v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td></tr>
+<tr class="returnAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 </tbody>
 <tbody>
 </tbody>
