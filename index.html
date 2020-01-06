@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script language="javascript">
+
+s4tTerms=[
+{"code":'sc',"label":'Service Code',"grouping":'TransportTaskInformation',"datatype":"xsd:string","definition":'Freight service code specifies if it is a standard, express, overnight, same day service, etc.  This will be unique to the shipper.',"example":"express"},
+{"code":'sCN',"label":'Ship to Contact Name',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"Jaco Voorspuij"},
+{"code":'sCo',"label":'Ship to Company Name',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"GS1 AISBL"},
+{"code":'sA1',"label":'Ship to Address 1',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 1)',"example":"Avenue Louise 326"},
+{"code":'sA2',"label":'Ship to Address 2',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 2)',"example":"Ixelles"},
+{"code":'sSb',"label":'Ship to Suburb',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Suburb/Town/City',"example":"Bruxelles"},
+{"code":'sSt',"label":'Ship to State/Locality',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential State/Locality'},
+{"code":'sRg',"label":'Ship to Region',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company Region'},
+{"code":'sPh',"label":'Ship to phone number',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Contact phone number for the receiver of the freight unit. Used to populate the system when no EDI has been received'},
+{"code":'Dg',"label":'Dangerous Goods Flag',"grouping":'FreightUnitInformation',"datatype":"xsd:boolean","definition":'A flag to indicate if the freight unit contains Dangerous Goods',"example":"N"},
+{"code":'mLv',"label":'Authority to leave',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that he/she may leave the transport unit at the destination location. Implies the operator does not need to hand the transport unit over to a person. Also implies no signature from recipient is required.',"example":"N"},
+{"code":'rqS',"label":'Signature Required Flag',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that the operator must get a signature from the recipient for having delivered the transport unit to the intended destination. This implies that delivery must be made to a person.',"example":"Y"},
+{"code":'dtNB',"label":'Not before Delivery Date Time',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":'In transportation, it is a common business requirement to not deliver before a set date.',"example":"2020-01-18"},
+{"code":'dtNA',"label":'Not after Delivery Date Time',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":'In transportation, it is a common business requirement to deliver before a set date.',"example":"2020-01-25"},
+{"code":'dtRe',"label":'Release date',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":"Sometimes transport service providers are required to 'hold' transport units for a while before these transport units are allowed to be sent out to recipients.","example":"2020-01-15"},
+{"code":'rCo',"label":'Return to Company Name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Company name for the return to address',"example":"GS1 Global Office"},
+{"code":'rCN',"label":'Return to Contact Name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Name of the contact freight unit is to be returned to',"example":"Dan Mullen"},
+{"code":'rA1',"label":'Return to Address 1',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential street address (Line 1)',"example":"300 Charles Ewing Boulevard"},
+{"code":'rA2',"label":'Return to Address 2',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential street address (Line 2)',"example":""},
+{"code":'rSb',"label":'Return to Suburb',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Suburb/Town/City',"example":"Ewing"},
+{"code":'rPC',"label":'Return to Post Code',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Postcode',"example":"08628"},
+{"code":'rRg',"label":'Return to Region',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Region',"example":""},
+{"code":'rSt',"label":'Return to State/Locality',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential State/Locality',"example":"New Jersey"},
+{"code":'rCC',"label":'Return to Country Code',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Country',"example":"US"}
+]
+
+
+function filterByGrouping(grouping) {
+    return function(element) {
+        return  element.grouping==grouping;
+    }
+}
+
+function gs1date(xsdDate) {
+	return xsdDate.replace(/\d\d(\d\d)-(\d\d)-(\d\d)/,"$1$2$3");
+}
+
+function processS4Tarray(s4tTerms) {
+	var orderedKeys=[];
+	var obj={};
+	var rv={};
+	s4tTerms.forEach(function(element) {
+		orderedKeys.push(element.code);
+		obj[element.code]=element;
+	});
+	rv.orderedKeys=orderedKeys;
+	rv.obj=obj;
+	rv.deliveryInstructions=s4tTerms.filter(filterByGrouping("DeliveryInstructions"));
+	return rv;
+}
+
+
+s4tObj=processS4Tarray(s4tTerms);
+
+
+</script>
+
+<style type="text/css">
+body { font-family: Verdana;}
+tr.transportTaskInfo { background-color: #FFCCCC;}
+tr.shippingAddress { background-color: #FFFFCC;}
+tr.deliveryInstructions { background-color: #CCFFCC;}
+tr.returnAddress { background-color: #CCCCFF;}
+tr.freightUnitInformation { background-color: #CCFFFF;}
+div#gs1DigitalLink {position: absolute; left: 50vw; top: 100px; width: 45vw;}
+div#qrCode {position: absolute; left: 50vw; top: 350px; width: 45vw;}
+textarea#dlOutput { width: 100%; font-size: 1em; height: 160px;}
+</style>
+</head>
+<body>
+<div id="app1">
+<h1>Scan4Transport Interactive Demo</h1>
+
+<p>By entering data in the form below, a GS1 Digital Link URI can be constructed, in which the Scan4Transport data is encoded in the URI query string, using the proposed short codes as URI query string keys.</p>
+
+
+<table>
+<tbody>
+<tr><td>SSCC</td><td><input type="text" v-model="sscc"></td></tr>
+<tr><td>URI stem</td><td><input type="text" v-model="uriStem"></td></tr>
+</tbody>
+<tbody v-for="ex in transportTaskInformation">
+<tr class="transportTaskInfo"><td>{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td></tr>
+</tbody>
+<tbody v-for="ex in freightUnitInformation">
+<tr class="freightUnitInformation"><td>{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td></tr>
+</tbody>
+<tbody v-for="ex in shippingAddressInfo">
+<tr class="shippingAddress"><td>{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td></tr>
+</tbody>
+<tbody v-for="ex in deliveryInstructions">
+<tr class="deliveryInstructions"><td>{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td></tr>
+</tbody>
+<tbody v-for="ex in returnAddressInfo">
+<tr class="returnAddress"><td>{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td></tr>
+</tbody>
+<tbody>
+</tbody>
+</table>
+
+<div id="gs1DigitalLink">
+<h2>GS1 Digital Link URI</h2>
+<p>GS1 Digital Link URI:<br><textarea id="dlOutput" v-model="gs1dlURI" readonly="true"></textarea></p>
+</div>
+<div id="qrCode">
+<h2>QR code</h2>
+<img id="qrCode" v-bind:src="qrURI" width="350" height="350"/>
+</div>
+
+</div>
+
+<script language="javascript">
+
+	var sscc="106141412345678908";
+	var uriStem="https://example.com";
+	var s4tData={};
+	var qrURI="blank.png";
+
+
+	var app1 = new Vue({
+		el: "#app1",
+		data : {
+			s4tTerms: s4tTerms,
+			sscc: sscc,
+			uriStem: uriStem,
+			s4tData: s4tData,
+			qrURI: qrURI
+		},
+		computed : {
+			s4tObj : function() {
+				return processS4Tarray(this.s4tTerms);
+			},
+			s4tDataJSON : function() {
+				return JSON.stringify(this.s4tData);
+			},
+			deliveryInstructions : function() {
+				return s4tTerms.filter(filterByGrouping("DeliveryInstructions"));
+			},
+			taskInfo : function() {
+				return s4tTerms.filter(filterByGrouping("TransportTaskInformation"));
+			},
+			returnAddressInfo : function() {
+				return s4tTerms.filter(filterByGrouping("ReturnAddressInformation"));
+			},
+			shippingAddressInfo : function() {
+				return s4tTerms.filter(filterByGrouping("ShippingAddressInformation"));
+			},
+			transportTaskInformation : function() {
+				return s4tTerms.filter(filterByGrouping("TransportTaskInformation"));
+			},
+			freightUnitInformation: function() {
+				return s4tTerms.filter(filterByGrouping("FreightUnitInformation"));
+			},
+
+			
+			
+			queryString: function() {
+				s4to=JSON.parse(this.s4tDataJSON);
+				kvPairs=[];
+				s4tObj.orderedKeys.forEach(function(k) {
+					if ((s4to.hasOwnProperty(k)) && (s4to[k] !== "")) {
+						var valToEncode=encodeURIComponent(s4to[k]);
+						if (this.s4tObj.obj[k].datatype=="xsd:date") {							
+							valToEncode=gs1date(s4to[k]);
+						}
+					    kvPairs.push(k+"="+valToEncode);
+					
+					}
+				});
+				return kvPairs.join("&");
+			},
+			gs1dlURI: function() {
+				var uriStem=this.uriStem.replace(/\/$/,"");
+				var qs=this.queryString.replace(/\%20/gs,"+");
+				var dl = uriStem+"/00/"+this.sscc;
+				if (qs !== "") {
+				  dl+="?"+qs;
+				}
+					this.generateQR(dl);
+				return dl;
+				
+			}
+		
+		},
+		methods: {
+			demoData: function(el) {
+				var demoVal = s4tObj.obj[el].example;
+				Vue.set(app1.s4tData,el,demoVal);
+			},
+			generateQR: function(el) {
+				this.qrURI="https://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl="+encodeURIComponent(el);
+			}
+		
+		}
+		
+		});
+
+
+
+</script>
+
+</body>
+</html>
