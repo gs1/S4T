@@ -4,7 +4,7 @@
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script language="javascript">
 
-s4tTerms=[
+var s4tTerms=[
 {"code":'sc',"label":'Service Code',"grouping":'TransportTaskInformation',"datatype":"xsd:string","definition":'Freight service code specifies if it is a standard, express, overnight, same day service, etc.  This will be unique to the shipper.',"example":"express"},
 {"code":'sCN',"label":'Ship to Contact Name',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"Jaco Voorspuij"},
 {"code":'sCo',"label":'Ship to Company Name',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"GS1 AISBL"},
@@ -31,13 +31,13 @@ s4tTerms=[
 {"code":'rSt',"label":'Return to Locality (town/city)',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Locality (town/city)',"example":"Ewing"},
 {"code":'rRg',"label":'Return to Region (state/county)',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Region (state/county)',"example":"New Jersey"},
 {"code":'rCC',"label":'Return to Country Code',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Country',"example":"US"}
-]
+];
 
 
 function filterByGrouping(grouping) {
     return function(element) {
         return  element.grouping==grouping;
-    }
+    };
 }
 
 function gs1date(xsdDate) {
@@ -59,7 +59,7 @@ function processS4Tarray(s4tTerms) {
 }
 
 
-s4tObj=processS4Tarray(s4tTerms);
+var s4tObj=processS4Tarray(s4tTerms);
 
 
 </script>
@@ -184,7 +184,7 @@ img#qrCode {position: relative; left: calc(22.5vw - 175px);}
 			},
 			gs1dlURI: function() {
 				var uriStem=this.uriStem.replace(/\/$/,"");
-				var qs=this.queryString.replace(/\%20/gs,"+");
+				var qs=this.queryString.replace(/\%20/g,"+");
 				var dl = uriStem+"/00/"+this.sscc;
 				if (qs !== "") {
 				  dl+="?"+qs;
