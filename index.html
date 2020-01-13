@@ -11,7 +11,7 @@ var s4tTerms=[
 {"code":'sA1',"label":'Ship to Address 1',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 1)',"example":"Avenue Louise 326"},
 {"code":'sA2',"label":'Ship to Address 2',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 2)',"example":"Blue Tower"},
 {"code":'sSb',"label":'Ship to Suburb',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Suburb',"example":"Ixelles"},
-{"code":'sPC',"label":'Ship to Post Code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Postcode',"example":"1050"},
+{"code":'421',"label":'Ship to Post Code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Postcode',"example":"0561050"},
 {"code":'sSt',"label":'Ship to Locality (town/city)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Locality (town/city)',"example":"Bruxelles"},
 {"code":'sRg',"label":'Ship to Region (state/county)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company Region (state/county)',"example":"Brussels-Capital Region"},
 {"code":'sCC',"label":'Ship to Country Code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Country',"example":"BE"},
@@ -30,7 +30,16 @@ var s4tTerms=[
 {"code":'rPC',"label":'Return to Post Code',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Postcode',"example":"08628"},
 {"code":'rSt',"label":'Return to Locality (town/city)',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Locality (town/city)',"example":"Ewing"},
 {"code":'rRg',"label":'Return to Region (state/county)',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Region (state/county)',"example":"New Jersey"},
-{"code":'rCC',"label":'Return to Country Code',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Country',"example":"US"}
+{"code":'rCC',"label":'Return to Country Code',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Country',"example":"US"},
+{"code":'401',"label":'GINC',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Global Identification Number for Consignment (GINC)',"example":"0614141ABC12345"},
+{"code":'402',"label":'GSIN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Global Shipment Identification Number (GSIN)',"example":"06141410000000012"},
+{"code":'403',"label":'Routing code',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Routing Code: AI(403)',"example":"DEF19485"},
+{"code":'410',"label":'Ship-to / Deliver-to GLN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Ship-to / Deliver-to GLN',"example":"0614141987658"},
+{"code":'413',"label":'Ship-for / Deliver-for GLN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Ship-for / Deliver-for GLN',"example":"0614141567898"},
+{"code":'330n',"label":'Logistic Weight (kg)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic weight (kg)',"example":"13.542","unit":"kg"},
+{"code":'331n',"label":'Length of first dimension (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Length of first dimension (m)',"example":"0.75","unit":"m"},
+{"code":'333n',"label":'Depth, thickness, height (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Depth, thickness, height or third dimension (m)',"example":"0.35","unit":"m"},
+{"code":'336n',"label":'Logistic volume (cubic metres)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic volume (cubic metres)',"example":"0.085","unit":"m^3"}
 ];
 
 
@@ -44,6 +53,26 @@ function gs1date(xsdDate) {
 	return xsdDate.replace(/\d\d(\d\d)-(\d\d)-(\d\d)/,"$1$2$3");
 }
 
+function gs1measurement(val) {
+	var ndp=0;
+	var rv={};
+	var numeric="";
+	if (val.indexOf(".")> -1) {
+		var parts=val.split(".");
+		ndp=parts[1].length;
+		numeric=parts[0]+parts[1];
+	} else {
+		numeric=val;
+	}
+		if (numeric.length < 6) {
+		numeric="0".repeat(6-numeric.length)+numeric;
+	}
+	
+	rv.ndp=ndp;
+	rv.sixdigit=numeric;
+	return rv;
+}
+
 function processS4Tarray(s4tTerms) {
 	var orderedKeys=[];
 	var obj={};
@@ -54,13 +83,15 @@ function processS4Tarray(s4tTerms) {
 	});
 	rv.orderedKeys=orderedKeys;
 	rv.obj=obj;
-	rv.deliveryInstructions=s4tTerms.filter(filterByGrouping("DeliveryInstructions"));
 	return rv;
 }
 
 
 var s4tObj=processS4Tarray(s4tTerms);
 
+var mode=0;
+
+var zeroToFive=["0","1","2","3","4","5"];
 
 </script>
 
@@ -72,54 +103,116 @@ tr.shippingAddress { background-color: #FFFFCC;}
 tr.deliveryInstructions { background-color: #CCFFCC;}
 tr.returnAddress { background-color: #CCCCFF;}
 tr.freightUnitInformation { background-color: #CCFFFF;}
-div#gs1DigitalLink {position: absolute; left: 50vw; top: 100px; width: 45vw;}
-div#qrCode {position: absolute; left: 50vw; top: 350px; width: 45vw;}
+tr.otherIdentifiers { background-color: #FFCC99;}
+tr.measurements { background-color: #D9D9D9;}
+div#gs1DigitalLink {position: absolute; left: 50vw; top: 130px; width: 45vw;}
+div#gs1DigitalLinkDecode {position: absolute; left: 0vw; top: 140px; width: 45vw;}
+div#qrCode {position: absolute; left: 50vw; top: 360px; width: 45vw;}
+table#decodedData {position: absolute; left: 50vw; top: 120px; width: 45vw;}
 textarea#dlOutput { width: 100%; font-size: 1em; height: 160px;}
 td.s4tCode {text-align: center;}
 input.maxWidth {width: 100%;}
-img#qrCode {position: relative; left: calc(22.5vw - 175px);}
+img#qrCode {position: relative; left: calc(22.5vw - 155px);}
+div#navbar {width: 100%; height: 1.5em;}
+input.navbutton {width: 49%; text-align: center;  font-weight: 700;}
+input#encode { float: left; }
+input#decode {float: right; }
+.activeButton {background-color: #000099; color: #FFFFFF;}
+.inactiveButton {background-color: #FFFFFF; color: #000099;}
 </style>
 </head>
 <body>
 <div id="app1">
 <h1>GS1 Scan4Transport Interactive Demo</h1>
 
-<p>Enter data in the form below to generate a GS1 Digital Link URI and encode it within a QR code.</p>
-
-<table>
-<tbody>
-<tr><td title="Serial Shipping Container Code">SSCC</td><td colspan="2"><input class="maxWidth" type="text" v-model="sscc" pattern="[0-9]{18}"></td><td></td></tr>
-<tr><td>URI stem</td><td colspan="4"><input class="maxWidth" type="text" v-model="uriStem"></td></tr>
-<tr><td></td><td></td><td></td><td>S4T Code</td></tr>
-</tbody>
-<tbody v-for="ex in transportTaskInformation">
-<tr class="transportTaskInfo"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
-</tbody>
-<tbody v-for="ex in freightUnitInformation">
-<tr class="freightUnitInformation"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
-</tbody>
-<tbody v-for="ex in shippingAddressInfo">
-<tr class="shippingAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
-</tbody>
-<tbody v-for="ex in deliveryInstructions">
-<tr class="deliveryInstructions"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
-</tbody>
-<tbody v-for="ex in returnAddressInfo">
-<tr class="returnAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
-</tbody>
-<tbody>
-</tbody>
-</table>
-
-<div id="gs1DigitalLink">
-<h2>GS1 Digital Link URI</h2>
-<textarea id="dlOutput" v-model="gs1dlURI" readonly="true"></textarea>
+<div id="navbar">
+<input button id="encode" class="navbutton" value="ENCODE / GENERATE" @click="setMode(0)" v-bind:class="{ activeButton: (mode==0), inactiveButton: (mode==1) }"/><input button id="decode" class="navbutton" value="DECODE"  @click="setMode(1)" v-bind:class="{ activeButton: (mode==1), inactiveButton: (mode==0) }"/>
 </div>
-<div id="qrCode">
-<h2>QR code (encoding GS1 Digital Link URI)</h2>
-<img id="qrCode" v-bind:src="qrURI" width="350" height="350"/>
-</div>
+<div v-if="mode==0">
+	<p>Enter data in the form below to generate a GS1 Digital Link URI and encode it within a QR code.</p>
 
+	<table>
+	<tbody>
+	<tr><td title="Serial Shipping Container Code">SSCC</td><td colspan="2"><input class="maxWidth" type="text" v-model="sscc" pattern="[0-9]{18}"></td><td></td></tr>
+	<tr><td>URI stem</td><td colspan="4"><input class="maxWidth" type="text" v-model="uriStem"></td></tr>
+	<tr><td></td><td></td><td></td><td>S4T Code</td></tr>
+	</tbody>
+	<tbody v-for="ex in transportTaskInformation">
+	<tr class="transportTaskInfo"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	</tbody>
+	<tbody v-for="ex in freightUnitInformation">
+	<tr class="freightUnitInformation"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	</tbody>
+	<tbody v-for="ex in shippingAddressInfo">
+	<tr class="shippingAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	</tbody>
+	<tbody v-for="ex in deliveryInstructions">
+	<tr class="deliveryInstructions"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	</tbody>
+	<tbody v-for="ex in returnAddressInfo">
+	<tr class="returnAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	</tbody>
+	<tbody v-for="ex in otherIdentifiers">
+	<tr class="otherIdentifiers"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	</tbody>
+	<tbody v-for="ex in measurements">
+	<tr class="measurements"><td v-bind:title="ex.definition">{{ex.label}}</td><td><input type="text" v-model="s4tData[ex.code]">{{ex.unit}}</td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	</tbody>
+	<tbody>
+	</tbody>
+	</table>
+
+	<div id="gs1DigitalLink">
+	<h2>GS1 Digital Link URI</h2>
+	<textarea id="dlOutput" v-model="gs1dlURI" readonly="true"></textarea>
+	</div>
+	<div id="qrCode">
+	<h2>QR code (encoding GS1 Digital Link URI)</h2>
+	<img id="qrCode" v-bind:src="qrURI" width="350" height="350"/>
+	</div>
+
+</div>
+<div v-if="mode==1">
+	<p>Enter a GS1 Digital Link URI to decode S4T data.</p>
+
+	<div id="gs1DigitalLinkDecode">
+	<h2>GS1 Digital Link URI</h2>
+	<textarea id="dlOutput" v-model="gs1dlURI2decode"></textarea>
+	</div>
+
+	<table id="decodedData">
+	<tbody>
+	<tr><td title="Serial Shipping Container Code">SSCC</td><td colspan="1">{{ssccExtracted}}</td><td></td></tr>
+	<tr><td>URI stem</td><td colspan="3">{{uriStemExtracted}}</td></tr>
+	<tr><td></td><td></td><td>S4T Code</td></tr>
+	</tbody>
+	<tbody v-for="ex in transportTaskInformation">
+	<tr class="transportTaskInfo"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td><td class="s4tCode">{{ex.code}}</td></tr>
+	</tbody>
+	<tbody v-for="ex in freightUnitInformation">
+	<tr class="freightUnitInformation"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td><td class="s4tCode">{{ex.code}}</td></tr>
+	</tbody>
+	<tbody v-for="ex in shippingAddressInfo">
+	<tr class="shippingAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td><td class="s4tCode">{{ex.code}}</td></tr>
+	</tbody>
+	<tbody v-for="ex in deliveryInstructions">
+	<tr class="deliveryInstructions"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td><td class="s4tCode">{{ex.code}}</td></tr>
+	</tbody>
+	<tbody v-for="ex in returnAddressInfo">
+	<tr class="returnAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td><td class="s4tCode">{{ex.code}}</td></tr>
+	</tbody>
+	<tbody v-for="ex in otherIdentifiers">
+	<tr class="otherIdentifiers"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td><td class="s4tCode">{{ex.code}}</td></tr>
+	</tbody>
+	<tbody v-for="ex in measurements">
+	<tr class="measurements"><td v-bind:title="ex.definition">{{ex.label}}</td><td>{{gs1ToMeasurement(queryStringExtracted, ex.code).value}} {{ex.unit}}</td><td class="s4tCode">{{gs1ToMeasurement(queryStringExtracted, ex.code).code}}</td></tr>
+	</tbody>
+	<tbody>
+	</tbody>
+	</table>
+
+
+</div>
 </div>
 
 <script language="javascript">
@@ -128,6 +221,9 @@ img#qrCode {position: relative; left: calc(22.5vw - 175px);}
 	var uriStem="https://example.com";
 	var s4tData={};
 	var qrURI="blank.png";
+	var gs1dlURI2decode="";
+	var booleans={"Y":"Yes","N":"No",undefined:""};
+
 
 
 	var app1 = new Vue({
@@ -137,7 +233,11 @@ img#qrCode {position: relative; left: calc(22.5vw - 175px);}
 			sscc: sscc,
 			uriStem: uriStem,
 			s4tData: s4tData,
-			qrURI: qrURI
+			qrURI: qrURI,
+			mode: mode,
+			booleans: booleans,
+			zeroToFive: zeroToFive,
+			gs1dlURI2decode : gs1dlURI2decode
 		},
 		computed : {
 			s4tObj : function() {
@@ -164,8 +264,66 @@ img#qrCode {position: relative; left: calc(22.5vw - 175px);}
 			freightUnitInformation: function() {
 				return s4tTerms.filter(filterByGrouping("FreightUnitInformation"));
 			},
+			otherIdentifiers: function() {
+				return s4tTerms.filter(filterByGrouping("OtherIdentifiers"));
+			},
+			measurements: function() {
+				return s4tTerms.filter(filterByGrouping("Measurements"));
+			},
 
-			
+			queryStringExtracted: function() {
+				var uri=this.gs1dlURI2decode;
+				var qso={};
+				if (uri !== undefined && uri !== null && uri !== "") {
+					if (uri.indexOf(" ")> -1) {
+						uri=uri.substr(0,uri.indexOf(" "));
+					}
+					var qsa=uri.substr(1-(0-uri.indexOf("?"))).split("&");
+					qsa.forEach(function(el) {
+						if (el !== undefined) {
+							var kv=el.split("=");
+							if (kv[1] !== null & kv[1] !== undefined) {
+							var v=kv[1].replace(/\+/g,"%20");
+							qso[kv[0]]=decodeURIComponent(v);
+							}
+						}
+					});
+				}
+				return qso;
+			},
+			ssccExtracted : function() {
+				var pathInfo="";
+				var sscc="";
+				if (this.gs1dlURI2decode !== undefined && this.gs1dlURI2decode !== null && this.gs1dlURI2decode !== "") {
+					var inq = this.gs1dlURI2decode.indexOf("?");
+					if (inq== -1) {
+						pathInfo = this.gs1dlURI2decode;
+					} else {
+						pathInfo = this.gs1dlURI2decode.substr(0,this.gs1dlURI2decode.indexOf("?"));
+					}
+					var reSSCC=new RegExp("(\\/(?:sscc|00)\\/\\d{18})$");
+					if (reSSCC.test(pathInfo)) {
+						sscc=pathInfo.substr(pathInfo.length-18);
+					}
+				}
+				return sscc;
+			},
+			uriStemExtracted: function() {
+				var uriStem="";
+				if (this.gs1dlURI2decode !== undefined && this.gs1dlURI2decode !== null && this.gs1dlURI2decode !== "") {
+					var inq = this.gs1dlURI2decode.indexOf("?");
+					if (inq== -1) {
+						pathInfo = this.gs1dlURI2decode;
+					} else {
+						pathInfo = this.gs1dlURI2decode.substr(0,this.gs1dlURI2decode.indexOf("?"));
+					}
+					var reSSCC1=new RegExp("(\\/sscc\\/\\d{18})$");
+					var reSSCC2=new RegExp("(\\/00\\/\\d{18})$");
+					if (reSSCC1.test(pathInfo)) { uriStem = pathInfo.substr(0,pathInfo.length-24)}
+					if (reSSCC2.test(pathInfo)) { uriStem = pathInfo.substr(0,pathInfo.length-22)}
+				}
+				return uriStem;				
+			},
 			
 			queryString: function() {
 				s4to=JSON.parse(this.s4tDataJSON);
@@ -176,6 +334,13 @@ img#qrCode {position: relative; left: calc(22.5vw - 175px);}
 						if (this.s4tObj.obj[k].datatype=="xsd:date") {							
 							valToEncode=gs1date(s4to[k]);
 						}
+						if (this.s4tObj.obj[k].datatype=="gs1:Measurement") {
+							var rv=gs1measurement(s4to[k]);
+							valToEncode = rv.sixdigit;
+							k=k.replace("n",rv.ndp);
+						}
+						
+						
 					    kvPairs.push(k+"="+valToEncode);
 					
 					}
@@ -189,7 +354,8 @@ img#qrCode {position: relative; left: calc(22.5vw - 175px);}
 				if (qs !== "") {
 				  dl+="?"+qs;
 				}
-					this.generateQR(dl);
+				this.generateQR(dl);
+				this.gs1dlURI2decode = dl;
 				return dl;
 				
 			}
@@ -199,6 +365,50 @@ img#qrCode {position: relative; left: calc(22.5vw - 175px);}
 			demoData: function(el) {
 				var demoVal = s4tObj.obj[el].example;
 				Vue.set(app1.s4tData,el,demoVal);
+			},
+			gs1ToMeasurement: function(queryStringExtracted,code) {
+				var rv={};
+				this.zeroToFive.forEach(function(el) {
+					var tempCode=code.replace("n",el);
+					if (queryStringExtracted.hasOwnProperty(tempCode)) {
+						rv.value=queryStringExtracted[tempCode]/Math.pow(10,parseInt(el));
+						rv.code=tempCode;
+					}
+				});
+				return rv;
+			},
+			gs1date3: function(gs1Date) {
+				var rv="";
+				var regexDate= new RegExp("^\\d{6}$");
+				if (gs1Date !== undefined && regexDate.test(gs1Date)) {
+				var doubleDigits = gs1Date.split(/(\d{2})/);
+				// TODO determine this correctly based on whether >=51 - see Gen Specs
+				var year=parseInt(doubleDigits[1]);
+				
+				var currentYear=new Date().getFullYear().toString();
+				var currentLastYY=parseInt(currentYear.substr(-2));
+				var currentFirstYY=parseInt(currentYear.substr(0,2));
+				
+				var diff=year-currentLastYY;
+				var fullyear=currentFirstYY.toString()+year.toString();
+				if (diff >=51 && diff <= 99) {
+					fullyear=(currentFirstYY-1).toString()+year.toString();
+				}
+				if (diff >= -99 && diff <= -50) {
+					fullyear=(currentFirstYY+1).toString()+year.toString();
+				}
+				
+				if (fullyear !== undefined) {
+				rv=doubleDigits[5]+"/"+doubleDigits[3]+"/"+fullyear;
+				}
+				}
+				return rv;
+			},
+			setMode: function(el) {
+				this.mode=el;
+			},
+			booleanValue: function(el) {
+				return this.booleans[el];
 			},
 			generateQR: function(el) {
 				this.qrURI="https://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl="+encodeURIComponent(el);
