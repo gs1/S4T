@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Example Encoder/Decoder for S4T and GS1 Digital Link</title>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script language="javascript">
 
@@ -99,6 +98,7 @@ var zeroToFive=["0","1","2","3","4","5"];
 <style type="text/css">
 body { font-family: Verdana; }
 h1 {text-align: center;}
+h2 {text-align: center;}
 tr.transportTaskInfo { background-color: #FFCCCC;}
 tr.shippingAddress { background-color: #FFFFCC;}
 tr.deliveryInstructions { background-color: #CCFFCC;}
@@ -106,11 +106,13 @@ tr.returnAddress { background-color: #CCCCFF;}
 tr.freightUnitInformation { background-color: #CCFFFF;}
 tr.otherIdentifiers { background-color: #FFCC99;}
 tr.measurements { background-color: #D9D9D9;}
-div#gs1DigitalLink {position: absolute; left: 50vw; top: 130px; width: 45vw;}
-div#gs1DigitalLinkDecode {position: absolute; left: 0vw; top: 140px; width: 45vw;}
-div#qrCode {position: absolute; left: 50vw; top: 360px; width: 45vw;}
-table#decodedData {position: absolute; left: 50vw; top: 120px; width: 45vw;}
+div#gs1DigitalLink {float: right; width: 45vw;}
+div#gs1DigitalLinkDecode {float: left; width: 45vw;}
+div#qrCode {float: right; }
+table#inputData {float: left;}
+table#decodedData {float: right;}
 textarea#dlOutput { width: 100%; font-size: 1em; height: 160px;}
+textarea#dlInput { width: 100%; font-size: 1em; height: 160px;}
 td.s4tCode {text-align: center;}
 input.maxWidth {width: 100%;}
 img#qrCode {position: relative; left: calc(22.5vw - 155px);}
@@ -132,32 +134,32 @@ input#decode {float: right; }
 <div v-if="mode==0">
 	<p>Enter data in the form below to generate a GS1 Digital Link URI and encode it within a QR code.</p>
 
-	<table>
+	<table id="inputData">
 	<tbody>
 	<tr><td title="Serial Shipping Container Code">SSCC</td><td colspan="2"><input class="maxWidth" type="text" v-model="sscc" pattern="[0-9]{18}"></td><td></td></tr>
 	<tr><td>URI stem</td><td colspan="4"><input class="maxWidth" type="text" v-model="uriStem"></td></tr>
 	<tr><td></td><td></td><td></td><td>S4T Code</td></tr>
 	</tbody>
 	<tbody v-for="ex in transportTaskInformation">
-	<tr class="transportTaskInfo"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="transportTaskInfo"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
 	<tbody v-for="ex in freightUnitInformation">
-	<tr class="freightUnitInformation"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="freightUnitInformation"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
 	<tbody v-for="ex in shippingAddressInfo">
-	<tr class="shippingAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="shippingAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
 	<tbody v-for="ex in deliveryInstructions">
-	<tr class="deliveryInstructions"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="deliveryInstructions"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
 	<tbody v-for="ex in returnAddressInfo">
-	<tr class="returnAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="returnAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
 	<tbody v-for="ex in otherIdentifiers">
-	<tr class="otherIdentifiers"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="otherIdentifiers"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
 	<tbody v-for="ex in measurements">
-	<tr class="measurements"><td v-bind:title="ex.definition">{{ex.label}}</td><td><input type="text" v-model="s4tData[ex.code]">{{ex.unit}}</td><td><input type="button" value="demo value" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="measurements"><td v-bind:title="ex.definition">{{ex.label}}</td><td><input type="text" v-model="s4tData[ex.code]">{{ex.unit}}</td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
 	<tbody>
 	</tbody>
@@ -178,7 +180,7 @@ input#decode {float: right; }
 
 	<div id="gs1DigitalLinkDecode">
 	<h2>GS1 Digital Link URI</h2>
-	<textarea id="dlOutput" v-model="gs1dlURI2decode"></textarea>
+	<textarea id="dlInput" v-model="gs1dlURI2decode"></textarea>
 	</div>
 
 	<table id="decodedData">
