@@ -1,0 +1,531 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <title>jsQR Demo</title>
+  <script src="jsQR.js"></script>
+  <link href="css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Ropa Sans', sans-serif;
+      color: #333;
+      margin: 10px auto;
+      position: relative;
+      font-size: 1em;
+    }
+
+    h1 {
+      margin: 10px 0;
+      font-size: 1.8em;
+    }
+
+    #loadingMessage {
+      text-align: center;
+      padding: 40px;
+      background-color: #eee;
+    }
+
+    #canvas {
+      width: 100%;
+    }
+
+    #output {
+      margin-top: 20px;
+      background: #eee;
+      padding: 10px;
+      padding-bottom: 0;
+    }
+
+    #output div {
+      padding-bottom: 10px;
+      word-wrap: break-word;
+    }
+
+    #noQRFound {
+      text-align: center;
+    }
+    
+    #outputData {
+       width: 100%; height: 200px; font-size: 0.7em;
+    }
+    
+    #clear {
+    font-size: 1.5em;
+    }
+
+    #showHideURI {
+    font-size: 1.5em;
+    }
+
+    #showHideVideo {
+    font-size: 1.5em;
+    }
+    
+    .fullwidth {
+    width: 100%; 
+    }
+    
+    .centred {
+    text-align:center; font-size: 1.5em;
+    }
+    
+    .halfwidth {
+    width: 50%; 
+    }
+
+    .thirdwidth {
+    width: 33%; 
+    }
+    
+    .active {
+    	background-color: #000099;
+    	color: #FFFFFF;
+    	font-weight: 700;
+    }
+
+    .inactive {
+    	background-color: #CCCCCC;
+    	color: #000000;
+    	font-weight: 400;
+    }
+    
+    .shippingAddress {
+    	background-color: #FFFFCC;
+    }
+    
+    .returnAddress {
+    	background-color: #CCCCFF;
+    }
+    
+.transportTaskInfo { background-color: #FFCCCC;}
+.shippingAddress { background-color: #FFFFCC;}
+.deliveryInstructions { background-color: #CCFFCC;}
+.returnAddress { background-color: #CCCCFF;}
+.freightUnitInformation { background-color: #CCFFFF;}
+.otherIdentifiers { background-color: #FFCC99;}
+.measurements { background-color: #D9D9D9;}
+td.label { width: 50%; font-size: 1.5em;}
+td.boldvalue {font-weight: 700; font-size: 1.5em;}
+td.value {font-weight: 400; font-size: 1.5em;}
+   
+    
+  </style>
+</head>
+<body>
+  <h1>S4T Decode Demo</h1>
+  <div id="app1">
+	  <div id="loadingMessage">🎥 Unable to access video stream (please make sure you have a webcam enabled)</div>
+	  <canvas id="canvas" v-show="v==1"></canvas>
+	  <div id="output">
+		<div v-if="u==1"><p><b>URI:</b></p><textarea id="outputData" v-model="gs1dlURI2decode"></textarea></div>
+	  </div>
+	  <table class="fullwidth">
+	  <tr><td class="thirdwidth"><input class="fullwidth centred" type="button" id="showHideVideo" v-bind:value="showHideVideoText[v]" @click="toggleVideo"></td><td class="thirdwidth"><input  class="fullwidth centred" type="button" id="showHideURI" v-bind:value="showHideURIText[u]" @click="toggleURI"></td><td class="thirdwidth"><input  class="fullwidth centred" id="clear" type="button" @click="clearURI" value="Clear URI"></td></tr>
+	  </table>
+	  <hr>
+	  <table class="fullwidth">
+	  <tr><td class="halfwidth"><input type="button" class="fullwidth centred" value="Shipping address" @click="toggle(0)" v-bind:class="{'active' : t==0, 'inactive': t==1}"></td><td class="halfwidth"><input type="button" class="fullwidth centred" value="Return address" @click="toggle(1)"  v-bind:class="{'active' : t==1, 'inactive': t==0}"></td></tr>
+	  </table>
+	<div v-if="t==0" class="shippingAddress">
+	<table class="fullwidth">
+	<tbody v-for="ex in shippingAddressInfo">
+	<tr class="shippingAddress"><td class="label" v-bind:title="ex.definition" v-if="l==1">{{ex.label}}</td><td class="boldvalue"><span v-if="s4tObj.obj[ex.code].datatype=='gs1:CountryCode'">{{countryCodes[queryStringExtracted[ex.code]]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td></tr>
+	</tbody>
+	</table>
+	</div>
+	<div v-if="t==1" class="returnAddress">
+	<table class="fullwidth">
+	<tbody v-for="ex in returnAddressInfo">
+	<tr class="returnAddress"><td class="label" v-bind:title="ex.definition"  v-if="l==1">{{ex.label}}</td><td class="boldvalue"><span v-if="s4tObj.obj[ex.code].datatype=='gs1:CountryCode'">{{countryCodes[queryStringExtracted[ex.code]]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td></tr>
+	</tbody>
+	</table>
+	</div>
+	<div class="transportTaskInfo">
+	<table class="fullwidth">
+	<tbody v-for="ex in transportTaskInformation">
+	<tr class="transportTaskInfo"><td class="label" v-bind:title="ex.definition">{{ex.label}}</td><td class="value"><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td></tr>
+	</tbody>
+	</table>
+	</div>
+	<div class="deliveryInstructions">
+	<table class="fullwidth">
+	<tbody v-for="ex in deliveryInstructions">
+	<tr class="deliveryInstructions"><td class="label" v-bind:title="ex.definition">{{ex.label}}</td><td class="value"><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td></tr>
+	</tbody>
+	</table>
+	</div>
+	<div class="freightUnitInformation">
+	<table class="fullwidth">
+	<tbody v-for="ex in freightUnitInformation">
+	<tr class="freightUnitInformation"><td class="label" v-bind:title="ex.definition">{{ex.label}}</td><td class="value"><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td></tr>
+	</tbody>
+	</table>
+	</div>
+	<div class="otherIdentifiers">
+	<table class="fullwidth">
+	<tbody v-for="ex in otherIdentifiers">
+	<tr class="otherIdentifiers"><td class="label" v-bind:title="ex.definition">{{ex.label}}</td><td class="value"><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td></tr>
+	</tbody>
+	</table>
+	</div>
+	<div class="measurements">
+	<table class="fullwidth">
+	<tbody v-for="ex in measurements">
+	<tr class="measurements"><td class="label" v-bind:title="ex.definition">{{ex.label}}</td><td class="value">{{gs1ToMeasurement(queryStringExtracted, ex.code).value}} <span v-if="gs1ToMeasurement(queryStringExtracted, ex.code).value > ''">{{ex.unit}}</span></td></tr>
+	</tbody>
+	</table>
+	</div>
+  </div>
+  
+  
+  <script>
+  
+  	var qrURI="";
+  	
+  	var t=0;
+  	var u=0;
+  	var v=0;
+  	var l=0;
+  	var showHideURIText=['Show URI','Hide URI'];
+  	var showHideVideoText=['Show Video','Hide Video'];
+ 
+	var s4tTerms=[
+	{"code":'sc',"label":'Service Code',"grouping":'TransportTaskInformation',"datatype":"xsd:string","definition":'Freight service code specifies if it is a standard, express, overnight, same day service, etc.  This will be unique to the shipper.',"example":"express"},
+	{"code":'sCN',"label":'Ship to Contact Name',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"Jaco Voorspuij"},
+	{"code":'sCo',"label":'Ship to Company Name',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"GS1 AISBL"},
+	{"code":'sA1',"label":'Ship to Address 1',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 1)',"example":"Avenue Louise 326"},
+	{"code":'sA2',"label":'Ship to Address 2',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 2)',"example":"Blue Tower"},
+	{"code":'sSb',"label":'Ship to Suburb',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Suburb',"example":"Ixelles"},
+	{"code":'420',"label":'Ship to Post Code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Postcode',"example":"1050"},
+	{"code":'sLN',"label":'Ship to Locality (town/city)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Locality (town/city)',"example":"Bruxelles"},
+	{"code":'sRg',"label":'Ship to Region (state/county)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company Region (state/county)',"example":"Brussels-Capital Region"},
+	{"code":'sCC',"label":'Ship to Country Code',"grouping":'ShippingAddressInformation',"datatype":"gs1:CountryCode","definition":'Receiving company/residential Country',"example":"BE"},
+	{"code":'sPh',"label":'Ship to phone number',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Contact phone number for the receiver of the freight unit. Used to populate the system when no EDI has been received','example':"+32 2 788 78 00"},
+	{"code":'dg',"label":'Dangerous Goods Flag',"grouping":'FreightUnitInformation',"datatype":"xsd:boolean","definition":'A flag to indicate if the freight unit contains Dangerous Goods',"example":"N"},
+	{"code":'mLv',"label":'Authority to leave',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that he/she may leave the transport unit at the destination location. Implies the operator does not need to hand the transport unit over to a person. Also implies no signature from recipient is required.',"example":"N"},
+	{"code":'rqS',"label":'Signature Required Flag',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that the operator must get a signature from the recipient for having delivered the transport unit to the intended destination. This implies that delivery must be made to a person.',"example":"Y"},
+	{"code":'dtNB',"label":'Not before Delivery Date Time',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":'In transportation, it is a common business requirement to not deliver before a set date.',"example":"2020-01-18"},
+	{"code":'dtNA',"label":'Not after Delivery Date Time',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":'In transportation, it is a common business requirement to deliver before a set date.',"example":"2020-01-25"},
+	{"code":'dtRe',"label":'Release date',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":"Sometimes transport service providers are required to 'hold' transport units for a while before these transport units are allowed to be sent out to recipients.","example":"2020-01-15"},
+	{"code":'rCN',"label":'Return to Contact Name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Name of the contact freight unit is to be returned to',"example":"Dan Mullen"},
+	{"code":'rCo',"label":'Return to Company Name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Company name for the return to address',"example":"GS1 Global Office"},
+	{"code":'rA1',"label":'Return to Address 1',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential street address (Line 1)',"example":"300 Charles Ewing Boulevard"},
+	{"code":'rA2',"label":'Return to Address 2',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential street address (Line 2)',"example":"Ground Floor Suite"},
+	{"code":'rSb',"label":'Return to Suburb',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Suburb',"example":"Ewingville"},
+	{"code":'rPC',"label":'Return to Post Code',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Postcode',"example":"08628"},
+	{"code":'rLN',"label":'Return to Locality (town/city)',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Locality (town/city)',"example":"Ewing"},
+	{"code":'rRg',"label":'Return to Region (state/county)',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Region (state/county)',"example":"New Jersey"},
+	{"code":'rCC',"label":'Return to Country Code',"grouping":'ReturnAddressInformation',"datatype":"gs1:CountryCode","definition":'Return to company/residential Country',"example":"US"},
+	{"code":'401',"label":'GINC',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Global Identification Number for Consignment (GINC)',"example":"0614141ABC12345"},
+	{"code":'402',"label":'GSIN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Global Shipment Identification Number (GSIN)',"example":"06141410000000012"},
+	{"code":'403',"label":'Routing code',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Routing Code: AI(403)',"example":"DEF19485"},
+	{"code":'410',"label":'Ship-to / Deliver-to GLN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Ship-to / Deliver-to GLN',"example":"0614141987658"},
+	{"code":'413',"label":'Ship-for / Deliver-for GLN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Ship-for / Deliver-for GLN',"example":"0614141567898"},
+	{"code":'330n',"label":'Logistic Weight (kg)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic weight (kg)',"example":"13.542","unit":"kg"},
+	{"code":'331n',"label":'Length of first dimension (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Length of first dimension (m)',"example":"0.75","unit":"m"},
+	{"code":'333n',"label":'Depth, thickness, height (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Depth, thickness, height or third dimension (m)',"example":"0.35","unit":"m"},
+	{"code":'336n',"label":'Logistic volume (cubic metres)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic volume (cubic metres)',"example":"0.085","unit":"m^3"}
+	];
+
+	function filterByGrouping(grouping) {
+		return function(element) {
+			return  element.grouping==grouping;
+		};
+	}
+
+	function gs1date(xsdDate) {
+		return xsdDate.replace(/\d\d(\d\d)-(\d\d)-(\d\d)/,"$1$2$3");
+	}
+
+	function gs1measurement(val) {
+		var ndp=0;
+		var rv={};
+		var numeric="";
+		if (val.indexOf(".")> -1) {
+			var parts=val.split(".");
+			ndp=parts[1].length;
+			numeric=parts[0]+parts[1];
+		} else {
+			numeric=val;
+		}
+			if (numeric.length < 6) {
+			numeric="0".repeat(6-numeric.length)+numeric;
+		}
+	
+		rv.ndp=ndp;
+		rv.sixdigit=numeric;
+		return rv;
+	}
+
+	function processS4Tarray(s4tTerms) {
+		var orderedKeys=[];
+		var obj={};
+		var rv={};
+		s4tTerms.forEach(function(element) {
+			orderedKeys.push(element.code);
+			obj[element.code]=element;
+		});
+		rv.orderedKeys=orderedKeys;
+		rv.obj=obj;
+		return rv;
+	}
+
+
+	var s4tObj=processS4Tarray(s4tTerms);
+
+	var mode=0;
+
+	var zeroToFive=["0","1","2","3","4","5"];
+	var countryCodes={"AF":"Afghanistan","AX":"Åland Islands","AL":"Albania","DZ":"Algeria","AS":"American Samoa","AD":"Andorra","AO":"Angola","AI":"Anguilla","AQ":"Antarctica","AG":"Antigua and Barbuda","AR":"Argentina","AM":"Armenia","AW":"Aruba","AU":"Australia","AT":"Austria","AZ":"Azerbaijan","BS":"Bahamas","BH":"Bahrain","BD":"Bangladesh","BB":"Barbados","BY":"Belarus","BE":"Belgium","BZ":"Belize","BJ":"Benin","BM":"Bermuda","BT":"Bhutan","BT":"Bhutan","BO":"Bolivia (Plurinational State of)","BO":"Bolivia (Plurinational State of)","BQ":"Bonaire, Sint Eustatius and Saba","BA":"Bosnia and Herzegovina","BW":"Botswana","BV":"Bouvet Island","BR":"Brazil","IO":"British Indian Ocean Territory","BN":"Brunei Darussalam","BG":"Bulgaria","BF":"Burkina Faso","BI":"Burundi","KH":"Cambodia","CM":"Cameroon","CA":"Canada","CV":"Cabo Verde","KY":"Cayman Islands","CF":"Central African Republic","TD":"Chad","CL":"Chile","CL":"Chile","CN":"China","CX":"Christmas Island","CC":"Cocos (Keeling) Islands","CO":"Colombia","CO":"Colombia","KM":"Comoros","CG":"Congo","CD":"Congo (Democratic Republic of the)","CK":"Cook Islands","CR":"Costa Rica","CI":"Côte d'Ivoire","HR":"Croatia","CU":"Cuba","CU":"Cuba","CW":"Curaçao","CY":"Cyprus","CZ":"Czech Republic","DK":"Denmark","DJ":"Djibouti","DM":"Dominica","DO":"Dominican Republic","EC":"Ecuador","EG":"Egypt","SV":"El Salvador","SV":"El Salvador","GQ":"Equatorial Guinea","ER":"Eritrea","EE":"Estonia","ET":"Ethiopia","FK":"Falkland Islands (Malvinas)","FO":"Faroe Islands","FJ":"Fiji","FI":"Finland","FR":"France","GF":"French Guiana","PF":"French Polynesia","TF":"French Southern Territories","GA":"Gabon","GM":"Gambia","GE":"Georgia","DE":"Germany","GH":"Ghana","GI":"Gibraltar","GR":"Greece","GL":"Greenland","GD":"Grenada","GP":"Guadeloupe","GU":"Guam","GT":"Guatemala","GG":"Guernsey","GN":"Guinea","GW":"Guinea-Bissau","GY":"Guyana","HT":"Haiti","HT":"Haiti","HM":"Heard Island and McDonald Islands","VA":"Holy See","HN":"Honduras","HK":"Hong Kong","HU":"Hungary","IS":"Iceland","IN":"India","ID":"Indonesia","IR":"Iran (Islamic Republic of)","IQ":"Iraq","IE":"Ireland","IM":"Isle of Man","IL":"Israel","IT":"Italy","JM":"Jamaica","JP":"Japan","JE":"Jersey","JO":"Jordan","KZ":"Kazakhstan","KE":"Kenya","KI":"Kiribati","KP":"Korea (Democratic People's Republic of)","KR":"Korea (Republic of)","KW":"Kuwait","KG":"Kyrgyzstan","LA":"Lao People's Democratic Republic","LV":"Latvia","LB":"Lebanon","LS":"Lesotho","LS":"Lesotho","LR":"Liberia","LY":"Libya","LI":"Liechtenstein","LT":"Lithuania","LU":"Luxembourg","MO":"Macao","MK":"Macedonia (the former Yugoslav Republic of)","MG":"Madagascar","MW":"Malawi","MY":"Malaysia","MV":"Maldives","ML":"Mali","MT":"Malta","MH":"Marshall Islands","MQ":"Martinique","MR":"Mauritania","MU":"Mauritius","YT":"Mayotte","MX":"Mexico","MX":"Mexico","FM":"Micronesia (Federated States of)","MD":"Moldova (Republic of)","MC":"Monaco","MN":"Mongolia","ME":"Montenegro","MS":"Montserrat","MA":"Morocco","MZ":"Mozambique","MM":"Myanmar","NA":"Namibia","NA":"Namibia","NR":"Nauru","NP":"Nepal","NL":"Netherlands","NC":"New Caledonia","NZ":"New Zealand","NI":"Nicaragua","NE":"Niger","NG":"Nigeria","NU":"Niue","NF":"Norfolk Island","MP":"Northern Mariana Islands","NO":"Norway","OM":"Oman","PK":"Pakistan","PW":"Palau","PS":"Palestine, State of","PA":"Panama","PA":"Panama","PG":"Papua New Guinea","PY":"Paraguay","PE":"Peru","PH":"Philippines","PN":"Pitcairn","PL":"Poland","PT":"Portugal","PR":"Puerto Rico","QA":"Qatar","RE":"Réunion","RO":"Romania","RU":"Russian Federation","RW":"Rwanda","BL":"Saint Barthélemy","SH":"Saint Helena, Ascension and Tristan da Cunha","KN":"Saint Kitts and Nevis","LC":"Saint Lucia","MF":"Saint Martin (French part)","PM":"Saint Pierre and Miquelon","VC":"Saint Vincent and the Grenadines","WS":"Samoa","SM":"San Marino","ST":"Sao Tome and Principe","SA":"Saudi Arabia","SN":"Senegal","RS":"Serbia","SC":"Seychelles","SL":"Sierra Leone","SG":"Singapore","SX":"Sint Maarten (Dutch part)","SK":"Slovakia","SI":"Slovenia","SB":"Solomon Islands","SO":"Somalia","ZA":"South Africa","GS":"South Georgia and the South Sandwich Islands","SS":"South Sudan","ES":"Spain","LK":"Sri Lanka","SD":"Sudan","SR":"Suriname","SJ":"Svalbard and Jan Mayen","SZ":"Swaziland","SE":"Sweden","CH":"Switzerland","SY":"Syrian Arab Republic","TW":"Taiwan, Province of China","TJ":"Tajikistan","TZ":"Tanzania, United Republic of","TH":"Thailand","TL":"Timor-Leste","TG":"Togo","TK":"Tokelau","TO":"Tonga","TT":"Trinidad and Tobago","TN":"Tunisia","TR":"Turkey","TM":"Turkmenistan","TC":"Turks and Caicos Islands","TV":"Tuvalu","UG":"Uganda","UA":"Ukraine","AE":"United Arab Emirates","GB":"United Kingdom of Great Britain and Northern Ireland","US":"United States of America","UM":"United States Minor Outlying Islands","UY":"Uruguay","UY":"Uruguay","UZ":"Uzbekistan","VU":"Vanuatu","VE":"Venezuela (Bolivarian Republic of)","VN":"Viet Nam","VG":"Virgin Islands (British)","VI":"Virgin Islands (U.S.)","WF":"Wallis and Futuna","EH":"Western Sahara","YE":"Yemen","ZM":"Zambia","ZW":"Zimbabwe"};
+	var sscc="";
+	var uriStem="";
+	var s4tData={};
+	var gs1dlURI2decode="";
+	var booleans={"Y":"Yes","N":"No",undefined:""};
+  
+  	var app1 = new Vue({
+		el: "#app1",
+		data : {
+			gs1dlURI2decode : gs1dlURI2decode,
+			t : t,
+			u : u,
+			showHideURIText : showHideURIText,
+			v : v,
+			l : l,
+			showHideVideoText : showHideVideoText,
+			s4tTerms: s4tTerms,
+			sscc: sscc,
+			uriStem: uriStem,
+			s4tData: s4tData,
+			qrURI: qrURI,
+			mode: mode,
+			booleans: booleans,
+			zeroToFive: zeroToFive,
+			gs1dlURI2decode : gs1dlURI2decode,
+			countryCodes : countryCodes
+		},
+		computed : {
+			s4tObj : function() {
+				return processS4Tarray(this.s4tTerms);
+			},
+			s4tDataJSON : function() {
+				return JSON.stringify(this.s4tData);
+			},
+			deliveryInstructions : function() {
+				return s4tTerms.filter(filterByGrouping("DeliveryInstructions"));
+			},
+			taskInfo : function() {
+				return s4tTerms.filter(filterByGrouping("TransportTaskInformation"));
+			},
+			returnAddressInfo : function() {
+				return s4tTerms.filter(filterByGrouping("ReturnAddressInformation"));
+			},
+			shippingAddressInfo : function() {
+				return s4tTerms.filter(filterByGrouping("ShippingAddressInformation"));
+			},
+			transportTaskInformation : function() {
+				return s4tTerms.filter(filterByGrouping("TransportTaskInformation"));
+			},
+			freightUnitInformation: function() {
+				return s4tTerms.filter(filterByGrouping("FreightUnitInformation"));
+			},
+			otherIdentifiers: function() {
+				return s4tTerms.filter(filterByGrouping("OtherIdentifiers"));
+			},
+			measurements: function() {
+				return s4tTerms.filter(filterByGrouping("Measurements"));
+			},
+
+			queryStringExtracted: function() {
+				var uri=this.gs1dlURI2decode;
+				var qso={};
+				if (uri !== undefined && uri !== null && uri !== "") {
+					if (uri.indexOf(" ")> -1) {
+						uri=uri.substr(0,uri.indexOf(" "));
+					}
+					var qsa=uri.substr(1-(0-uri.indexOf("?"))).split("&");
+					qsa.forEach(function(el) {
+						if (el !== undefined) {
+							var kv=el.split("=");
+							if (kv[1] !== null & kv[1] !== undefined) {
+							var v=kv[1].replace(/\+/g,"%20");
+							qso[kv[0]]=decodeURIComponent(v);
+							}
+						}
+					});
+				}
+				return qso;
+			},
+			ssccExtracted : function() {
+				var pathInfo="";
+				var sscc="";
+				if (this.gs1dlURI2decode !== undefined && this.gs1dlURI2decode !== null && this.gs1dlURI2decode !== "") {
+					var inq = this.gs1dlURI2decode.indexOf("?");
+					if (inq== -1) {
+						pathInfo = this.gs1dlURI2decode;
+					} else {
+						pathInfo = this.gs1dlURI2decode.substr(0,this.gs1dlURI2decode.indexOf("?"));
+					}
+					var reSSCC=new RegExp("(\\/(?:sscc|00)\\/\\d{18})$");
+					if (reSSCC.test(pathInfo)) {
+						sscc=pathInfo.substr(pathInfo.length-18);
+					}
+				}
+				return sscc;
+			},
+			uriStemExtracted: function() {
+				var uriStem="";
+				if (this.gs1dlURI2decode !== undefined && this.gs1dlURI2decode !== null && this.gs1dlURI2decode !== "") {
+					var inq = this.gs1dlURI2decode.indexOf("?");
+					if (inq== -1) {
+						pathInfo = this.gs1dlURI2decode;
+					} else {
+						pathInfo = this.gs1dlURI2decode.substr(0,this.gs1dlURI2decode.indexOf("?"));
+					}
+					var reSSCC1=new RegExp("(\\/sscc\\/\\d{18})$");
+					var reSSCC2=new RegExp("(\\/00\\/\\d{18})$");
+					if (reSSCC1.test(pathInfo)) { uriStem = pathInfo.substr(0,pathInfo.length-24)}
+					if (reSSCC2.test(pathInfo)) { uriStem = pathInfo.substr(0,pathInfo.length-22)}
+				}
+				return uriStem;				
+			},
+			
+			queryString: function() {
+				s4to=JSON.parse(this.s4tDataJSON);
+				kvPairs=[];
+				s4tObj.orderedKeys.forEach(function(k) {
+					if ((s4to.hasOwnProperty(k)) && (s4to[k] !== "")) {
+						var valToEncode=encodeURIComponent(s4to[k]);
+						if (this.s4tObj.obj[k].datatype=="xsd:date") {							
+							valToEncode=gs1date(s4to[k]);
+						}
+						if (this.s4tObj.obj[k].datatype=="gs1:Measurement") {
+							var rv=gs1measurement(s4to[k]);
+							valToEncode = rv.sixdigit;
+							k=k.replace("n",rv.ndp);
+						}
+						
+						
+					    kvPairs.push(k+"="+valToEncode);
+					
+					}
+				});
+				return kvPairs.join("&");
+			},
+			gs1dlURI: function() {
+				var uriStem=this.uriStem.replace(/\/$/,"");
+				var qs=this.queryString.replace(/\%20/g,"+");
+				var dl = uriStem+"/00/"+this.sscc;
+				if (qs !== "") {
+				  dl+="?"+qs;
+				}
+				this.generateQR(dl);
+				this.gs1dlURI2decode = dl;
+				return dl;
+				
+			}
+		
+		},
+		
+		methods : {
+			clearURI : function() {
+			this.gs1dlURI2decode="";
+			},
+			toggle : function(e) {
+			this.t=e;
+			},
+			toggleURI : function() {
+			this.u=1-this.u;
+			},
+			toggleVideo : function() {
+			this.v=1-this.v;
+			},
+			gs1ToMeasurement: function(queryStringExtracted,code) {
+				var rv={};
+				this.zeroToFive.forEach(function(el) {
+					var tempCode=code.replace("n",el);
+					if (queryStringExtracted.hasOwnProperty(tempCode)) {
+						rv.value=queryStringExtracted[tempCode]/Math.pow(10,parseInt(el));
+						rv.code=tempCode;
+					}
+				});
+				return rv;
+			},
+			gs1date3: function(gs1Date) {
+				var rv="";
+				var regexDate= new RegExp("^\\d{6}$");
+				if (gs1Date !== undefined && regexDate.test(gs1Date)) {
+				var doubleDigits = gs1Date.split(/(\d{2})/);
+				// TODO determine this correctly based on whether >=51 - see Gen Specs
+				var year=parseInt(doubleDigits[1]);
+				
+				var currentYear=new Date().getFullYear().toString();
+				var currentLastYY=parseInt(currentYear.substr(-2));
+				var currentFirstYY=parseInt(currentYear.substr(0,2));
+				
+				var diff=year-currentLastYY;
+				var fullyear=currentFirstYY.toString()+year.toString();
+				if (diff >=51 && diff <= 99) {
+					fullyear=(currentFirstYY-1).toString()+year.toString();
+				}
+				if (diff >= -99 && diff <= -50) {
+					fullyear=(currentFirstYY+1).toString()+year.toString();
+				}
+				
+				if (fullyear !== undefined) {
+				rv=doubleDigits[5]+"/"+doubleDigits[3]+"/"+fullyear;
+				}
+				}
+				return rv;
+			},
+			setMode: function(el) {
+				this.mode=el;
+			},
+			booleanValue: function(el) {
+				return this.booleans[el];
+			}
+
+	    }
+	});
+  
+    var video = document.createElement("video");
+    var canvasElement = document.getElementById("canvas");
+    var canvas = canvasElement.getContext("2d");
+    var loadingMessage = document.getElementById("loadingMessage");
+    var outputContainer = document.getElementById("output");
+    var outputMessage = document.getElementById("outputMessage");
+    var outputData = document.getElementById("outputData");
+
+    // Use facingMode: environment to attemt to get the front camera on phones
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }).then(function(stream) {
+      video.srcObject = stream;
+      video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+      video.play();
+      requestAnimationFrame(tick);
+    });
+
+    function tick() {
+      loadingMessage.innerText = "⌛ Loading video..."
+      if (video.readyState === video.HAVE_ENOUGH_DATA) {
+        loadingMessage.hidden = true;
+        canvasElement.hidden = false;
+        outputContainer.hidden = false;
+
+        canvasElement.height = video.videoHeight;
+        canvasElement.width = video.videoWidth;
+        canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+        var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+        var code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: "dontInvert",
+        });
+        if (code) {
+			if (code.data !== "") {
+				app1.gs1dlURI2decode=code.data;
+			}
+        }
+      }
+      requestAnimationFrame(tick);
+    }
+  </script>
+
+
+</body></html>
