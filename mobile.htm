@@ -139,6 +139,16 @@ td.value {font-weight: 400; font-size: 1.5em;}
 	</tbody>
 	</table>
 	</div>
+	<div class="otherIdentifiers">
+	<table class="fullwidth">
+	<tbody>
+	<tr class="otherIdentifiers"><td class="label">SSCC</td><td class="boldvalue">{{ssccExtracted}}<span></td></tr>
+	</tbody>
+	<tbody v-for="ex in otherIdentifiers">
+	<tr class="otherIdentifiers"><td class="label" v-bind:title="ex.definition">{{ex.label}}</td><td class="value"><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td></tr>
+	</tbody>
+	</table>
+	</div>
 	<div class="transportTaskInfo">
 	<table class="fullwidth">
 	<tbody v-for="ex in transportTaskInformation">
@@ -157,13 +167,6 @@ td.value {font-weight: 400; font-size: 1.5em;}
 	<table class="fullwidth">
 	<tbody v-for="ex in freightUnitInformation">
 	<tr class="freightUnitInformation"><td class="label" v-bind:title="ex.definition">{{ex.label}}</td><td class="value"><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td></tr>
-	</tbody>
-	</table>
-	</div>
-	<div class="otherIdentifiers">
-	<table class="fullwidth">
-	<tbody v-for="ex in otherIdentifiers">
-	<tr class="otherIdentifiers"><td class="label" v-bind:title="ex.definition">{{ex.label}}</td><td class="value"><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td></tr>
 	</tbody>
 	</table>
 	</div>
@@ -200,9 +203,9 @@ td.value {font-weight: 400; font-size: 1.5em;}
 	{"code":'sRg',"label":'Ship to Region (state/county)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company Region (state/county)',"example":"Brussels-Capital Region"},
 	{"code":'sCC',"label":'Ship to Country Code',"grouping":'ShippingAddressInformation',"datatype":"gs1:CountryCode","definition":'Receiving company/residential Country',"example":"BE"},
 	{"code":'sPh',"label":'Ship to phone number',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Contact phone number for the receiver of the freight unit. Used to populate the system when no EDI has been received','example':"+32 2 788 78 00"},
-	{"code":'dg',"label":'Dangerous Goods Flag',"grouping":'FreightUnitInformation',"datatype":"xsd:boolean","definition":'A flag to indicate if the freight unit contains Dangerous Goods',"example":"N"},
-	{"code":'mLv',"label":'Authority to leave',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that he/she may leave the transport unit at the destination location. Implies the operator does not need to hand the transport unit over to a person. Also implies no signature from recipient is required.',"example":"N"},
-	{"code":'rqS',"label":'Signature Required Flag',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that the operator must get a signature from the recipient for having delivered the transport unit to the intended destination. This implies that delivery must be made to a person.',"example":"Y"},
+	{"code":'dg',"label":'Dangerous Goods?',"grouping":'FreightUnitInformation',"datatype":"xsd:boolean","definition":'A flag to indicate if the freight unit contains Dangerous Goods',"example":"N"},
+	{"code":'mLv',"label":'Authority to leave?',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that he/she may leave the transport unit at the destination location. Implies the operator does not need to hand the transport unit over to a person. Also implies no signature from recipient is required.',"example":"N"},
+	{"code":'rqS',"label":'Signature Required?',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that the operator must get a signature from the recipient for having delivered the transport unit to the intended destination. This implies that delivery must be made to a person.',"example":"Y"},
 	{"code":'dtNB',"label":'Not before Delivery Date Time',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":'In transportation, it is a common business requirement to not deliver before a set date.',"example":"2020-01-18"},
 	{"code":'dtNA',"label":'Not after Delivery Date Time',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":'In transportation, it is a common business requirement to deliver before a set date.',"example":"2020-01-25"},
 	{"code":'dtRe',"label":'Release date',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":"Sometimes transport service providers are required to 'hold' transport units for a while before these transport units are allowed to be sent out to recipients.","example":"2020-01-15"},
