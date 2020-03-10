@@ -1,4 +1,6 @@
-<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   
   <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <title>GS1 Scan4Transport Mobile Demo</title>
@@ -102,6 +104,7 @@
 .freightUnitInformation { background-color: #CCFFFF;}
 .otherIdentifiers { background-color: #FFCC99;}
 .measurements { background-color: #D9D9D9;}
+.s4tdetected { background-color: #000099; color: #FFFFFF;}
 td.label { width: 50%; font-size: 1.5em;}
 td.boldvalue {font-weight: 700; font-size: 1.5em;}
 td.value {font-weight: 400; font-size: 1.5em;}
@@ -142,7 +145,7 @@ td.value {font-weight: 400; font-size: 1.5em;}
 	<div class="otherIdentifiers">
 	<table class="fullwidth">
 	<tbody>
-	<tr class="otherIdentifiers"><td class="label">SSCC</td><td class="boldvalue">{{ssccExtracted}}<span></td></tr>
+	<tr class="otherIdentifiers"><td class="label">{{primaryValueExtracted.code}}</td><td class="boldvalue">{{primaryValueExtracted.value}}<span></td></tr>
 	</tbody>
 	<tbody v-for="ex in otherIdentifiers">
 	<tr class="otherIdentifiers"><td class="label" v-bind:title="ex.definition">{{ex.label}}</td><td class="value"><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td></tr>
@@ -177,6 +180,13 @@ td.value {font-weight: 400; font-size: 1.5em;}
 	</tbody>
 	</table>
 	</div>
+	<div class="s4tdetected">
+	<table class="fullwidth">
+	<tbody>
+	<tr class="s4tdetected"><td class="label">Scan4Transport URI?</td><td class="value">{{s4tDetected}}</td></tr>
+	</tbody>
+	</table>
+	</div>
   </div>
   
   
@@ -190,48 +200,74 @@ td.value {font-weight: 400; font-size: 1.5em;}
   	var l=0;
   	var showHideURIText=['Show URI','Hide URI'];
   	var showHideVideoText=['Show Camera','Hide Camera'];
+
+	var s4tPrimaryIdentifiers=[
+		{"code":'00',"label":'SSCC',"grouping":'PrimaryIdentifiers',"datatype":"xsd:string","definition":'Serial Shipping Container Code (SSCC)',"example":"106141412345678908","percentEncoded":false,"pattern":"[0-9]{18}"},
+		{"code":'401',"label":'GINC',"grouping":'PrimaryIdentifiers',"datatype":"xsd:string","definition":'Global Identification Number for Consignment (GINC)',"example":"0614141ABC12345","percentEncoded":false,"pattern":"[0-9]{4}.{0,26}"},
+		{"code":'402',"label":'GSIN',"grouping":'PrimaryIdentifiers',"datatype":"xsd:string","definition":'Global Shipment Identification Number (GSIN)',"example":"06141410000000012","percentEncoded":false,"pattern":"[0-9]{17}"},
+	];
  
 	var s4tTerms=[
-	{"code":'sc',"label":'Service Code',"grouping":'TransportTaskInformation',"datatype":"xsd:string","definition":'Freight service code specifies if it is a standard, express, overnight, same day service, etc.  This will be unique to the shipper.',"example":"express"},
-	{"code":'sCN',"label":'Ship to Contact Name',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"Jaco Voorspuij"},
-	{"code":'sCo',"label":'Ship to Company Name',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"GS1 AISBL"},
-	{"code":'sA1',"label":'Ship to Address 1',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 1)',"example":"Avenue Louise 326"},
-	{"code":'sA2',"label":'Ship to Address 2',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 2)',"example":"Blue Tower"},
-	{"code":'sSb',"label":'Ship to Suburb',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Suburb',"example":"Ixelles"},
-	{"code":'420',"label":'Ship to Post Code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Postcode',"example":"1050"},
-	{"code":'sLN',"label":'Ship to Locality (town/city)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Locality (town/city)',"example":"Bruxelles"},
-	{"code":'sRg',"label":'Ship to Region (state/county)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company Region (state/county)',"example":"Brussels-Capital Region"},
-	{"code":'sCC',"label":'Ship to Country Code',"grouping":'ShippingAddressInformation',"datatype":"gs1:CountryCode","definition":'Receiving company/residential Country',"example":"BE"},
-	{"code":'sPh',"label":'Ship to phone number',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Contact phone number for the receiver of the freight unit. Used to populate the system when no EDI has been received','example':"+32 2 788 78 00"},
-	{"code":'dg',"label":'Dangerous Goods?',"grouping":'FreightUnitInformation',"datatype":"xsd:boolean","definition":'A flag to indicate if the freight unit contains Dangerous Goods',"example":"N"},
-	{"code":'mLv',"label":'Authority to leave?',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that he/she may leave the transport unit at the destination location. Implies the operator does not need to hand the transport unit over to a person. Also implies no signature from recipient is required.',"example":"N"},
-	{"code":'rqS',"label":'Signature Required?',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that the operator must get a signature from the recipient for having delivered the transport unit to the intended destination. This implies that delivery must be made to a person.',"example":"Y"},
-	{"code":'dtNB',"label":'Not before Delivery Date Time',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":'In transportation, it is a common business requirement to not deliver before a set date.',"example":"2020-01-18"},
-	{"code":'dtNA',"label":'Not after Delivery Date Time',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":'In transportation, it is a common business requirement to deliver before a set date.',"example":"2020-01-25"},
-	{"code":'dtRe',"label":'Release date',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":"Sometimes transport service providers are required to 'hold' transport units for a while before these transport units are allowed to be sent out to recipients.","example":"2020-01-15"},
-	{"code":'rCN',"label":'Return to Contact Name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Name of the contact freight unit is to be returned to',"example":"Dan Mullen"},
-	{"code":'rCo',"label":'Return to Company Name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Company name for the return to address',"example":"GS1 Global Office"},
-	{"code":'rA1',"label":'Return to Address 1',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential street address (Line 1)',"example":"300 Charles Ewing Boulevard"},
-	{"code":'rA2',"label":'Return to Address 2',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential street address (Line 2)',"example":"Ground Floor Suite"},
-	{"code":'rSb',"label":'Return to Suburb',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Suburb',"example":"Ewingville"},
-	{"code":'rPC',"label":'Return to Post Code',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Postcode',"example":"08628"},
-	{"code":'rLN',"label":'Return to Locality (town/city)',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Locality (town/city)',"example":"Ewing"},
-	{"code":'rRg',"label":'Return to Region (state/county)',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Region (state/county)',"example":"New Jersey"},
-	{"code":'rCC',"label":'Return to Country Code',"grouping":'ReturnAddressInformation',"datatype":"gs1:CountryCode","definition":'Return to company/residential Country',"example":"US"},
-	{"code":'401',"label":'GINC',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Global Identification Number for Consignment (GINC)',"example":"0614141ABC12345"},
-	{"code":'402',"label":'GSIN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Global Shipment Identification Number (GSIN)',"example":"06141410000000012"},
-	{"code":'403',"label":'Routing code',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Routing Code: AI(403)',"example":"DEF19485"},
-	{"code":'410',"label":'Ship-to / Deliver-to GLN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Ship-to / Deliver-to GLN',"example":"0614141987658"},
-	{"code":'413',"label":'Ship-for / Deliver-for GLN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Ship-for / Deliver-for GLN',"example":"0614141567898"},
-	{"code":'330n',"label":'Logistic Weight (kg)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic weight (kg)',"example":"13.542","unit":"kg"},
-	{"code":'331n',"label":'Length of first dimension (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Length of first dimension (m)',"example":"0.75","unit":"m"},
-	{"code":'333n',"label":'Depth, thickness, height (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Depth, thickness, height or third dimension (m)',"example":"0.35","unit":"m"},
-	{"code":'336n',"label":'Logistic volume (cubic metres)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic volume (cubic metres)',"example":"0.085","unit":"m^3"}
+		{"code":'sc',"label":'Service Code',"grouping":'TransportTaskInformation',"datatype":"xsd:string","definition":'Freight service code specifies if it is a standard, express, overnight, same day service, etc.  This will be unique to the shipper.',"example":"express","percentEncoded":true},
+		{"code":'sCN',"label":'Ship to Contact Name',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"Jaco Voorspuij","percentEncoded":true},
+		{"code":'sCo',"label":'Ship to Company Name',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"GS1 AISBL","percentEncoded":true},
+		{"code":'sA1',"label":'Ship to Address 1',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 1)',"example":"Avenue Louise 326","percentEncoded":true},
+		{"code":'sA2',"label":'Ship to Address 2',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 2)',"example":"Blue Tower","percentEncoded":true},
+		{"code":'sSb',"label":'Ship to Suburb',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Suburb',"example":"Ixelles","percentEncoded":true},
+		{"code":'420',"label":'Ship to Post Code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Postcode',"example":"1050","percentEncoded":false},
+		{"code":'sLN',"label":'Ship to Locality (town/city)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Locality (town/city)',"example":"Bruxelles","percentEncoded":true},
+		{"code":'sRg',"label":'Ship to Region (state/county)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company Region (state/county)',"example":"Brussels-Capital Region","percentEncoded":true},
+		{"code":'sCC',"label":'Ship to Country Code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Country',"example":"BE","percentEncoded":false},
+		{"code":'sPh',"label":'Ship to phone number',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Contact phone number for the receiver of the freight unit. Used to populate the system when no EDI has been received','example':"+32 2 788 78 00","percentEncoded":false},
+		{"code":'dg',"label":'Dangerous Goods Flag',"grouping":'FreightUnitInformation',"datatype":"xsd:boolean","definition":'A flag to indicate if the freight unit contains Dangerous Goods',"example":"N","percentEncoded":false},
+		{"code":'mLv',"label":'Authority to leave',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that he/she may leave the transport unit at the destination location. Implies the operator does not need to hand the transport unit over to a person. Also implies no signature from recipient is required.',"example":"N","percentEncoded":false},
+		{"code":'rqS',"label":'Signature Required Flag',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that the operator must get a signature from the recipient for having delivered the transport unit to the intended destination. This implies that delivery must be made to a person.',"example":"Y","percentEncoded":false},
+		{"code":'dtNB',"label":'Not before Delivery Date Time',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":'In transportation, it is a common business requirement to not deliver before a set date.',"example":"2020-01-18","percentEncoded":false},
+		{"code":'dtNA',"label":'Not after Delivery Date Time',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":'In transportation, it is a common business requirement to deliver before a set date.',"example":"2020-01-25","percentEncoded":false},
+		{"code":'dtRe',"label":'Release date',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":"Sometimes transport service providers are required to 'hold' transport units for a while before these transport units are allowed to be sent out to recipients.","example":"2020-01-15","percentEncoded":false},
+		{"code":'rCo',"label":'Return to Company Name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Company name for the return to address',"example":"GS1 Global Office","percentEncoded":true},
+		{"code":'rCN',"label":'Return to Contact Name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Name of the contact freight unit is to be returned to',"example":"Dan Mullen","percentEncoded":true},
+		{"code":'rA1',"label":'Return to Address 1',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential street address (Line 1)',"example":"300 Charles Ewing Boulevard","percentEncoded":true},
+		{"code":'rA2',"label":'Return to Address 2',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential street address (Line 2)',"example":"Ground Floor Suite","percentEncoded":true},
+		{"code":'rSb',"label":'Return to Suburb',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Suburb',"example":"Ewingville","percentEncoded":true},
+		{"code":'rPC',"label":'Return to Post Code',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Postcode',"example":"08628","percentEncoded":false},
+		{"code":'rLN',"label":'Return to Locality (town/city)',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Locality (town/city)',"example":"Ewing","percentEncoded":true},
+		{"code":'rRg',"label":'Return to Region (state/county)',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Region (state/county)',"example":"New Jersey","percentEncoded":true},
+		{"code":'rCC',"label":'Return to Country Code',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Country',"example":"US","percentEncoded":false},
+		{"code":'401',"label":'GINC',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Global Identification Number for Consignment (GINC)',"example":"0614141ABC12345","percentEncoded":false},
+		{"code":'402',"label":'GSIN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Global Shipment Identification Number (GSIN)',"example":"06141410000000012","percentEncoded":false},
+		{"code":'403',"label":'Routing code',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Routing Code: AI(403)',"example":"DEF19485","percentEncoded":false},
+		{"code":'410',"label":'Ship-to / Deliver-to GLN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Ship-to / Deliver-to GLN',"example":"0614141987658","percentEncoded":false},
+		{"code":'413',"label":'Ship-for / Deliver-for GLN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Ship-for / Deliver-for GLN',"example":"0614141567898","percentEncoded":false},
+		{"code":'330n',"label":'Logistic Weight (kg)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic weight (kg)',"example":"13.542","unit":"kg","percentEncoded":false},
+		{"code":'331n',"label":'Length of first dimension (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Length of first dimension (m)',"example":"0.75","unit":"m","percentEncoded":false},
+		{"code":'332n',"label":'Width of second dimension (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Width of second dimension (m)',"example":"0.55","unit":"m","percentEncoded":false},
+		{"code":'333n',"label":'Depth, thickness, height (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Depth, thickness, height or third dimension (m)',"example":"0.35","unit":"m","percentEncoded":false},
+		{"code":'336n',"label":'Logistic volume (cubic metres)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic volume (cubic metres)',"example":"0.085","unit":"m^3","percentEncoded":false}
 	];
 
 	function filterByGrouping(grouping) {
 		return function(element) {
 			return  element.grouping==grouping;
+		};
+	}
+
+	function filterExcludeGrouping(grouping) {
+		return function(element) {
+			return  element.grouping!==grouping;
+		};
+	}
+
+
+	function filterByLabel(id) {
+		return function(element) {
+			return  element.label==id;
+		};
+	}
+
+	function filterExcludeLabel(id) {
+		return function(element) {
+			return  element.label!==id;
 		};
 	}
 
@@ -332,7 +368,7 @@ td.value {font-weight: 400; font-size: 1.5em;}
 				return s4tTerms.filter(filterByGrouping("FreightUnitInformation"));
 			},
 			otherIdentifiers: function() {
-				return s4tTerms.filter(filterByGrouping("OtherIdentifiers"));
+				return s4tTerms.filter(filterByGrouping("OtherIdentifiers")).filter(filterExcludeLabel(this.primaryValueExtracted.code));
 			},
 			measurements: function() {
 				return s4tTerms.filter(filterByGrouping("Measurements"));
@@ -358,9 +394,20 @@ td.value {font-weight: 400; font-size: 1.5em;}
 				}
 				return qso;
 			},
-			ssccExtracted : function() {
-				var pathInfo="";
-				var sscc="";
+
+			s4tDetected : function() {
+				let rv="No";
+				if (this.gs1dlURI2decode.slice(-4) == "&s4t") {
+				rv="Yes";
+				}
+				return rv;
+			},
+			
+			primaryValueExtracted : function() {
+				let pathInfo="";
+				let rv={};
+				let c={"00":"SSCC","402":"GSIN","401":"GINC"};
+				let digits=new RegExp("^\\d+$");
 				if (this.gs1dlURI2decode !== undefined && this.gs1dlURI2decode !== null && this.gs1dlURI2decode !== "") {
 					var inq = this.gs1dlURI2decode.indexOf("?");
 					if (inq== -1) {
@@ -368,12 +415,20 @@ td.value {font-weight: 400; font-size: 1.5em;}
 					} else {
 						pathInfo = this.gs1dlURI2decode.substr(0,this.gs1dlURI2decode.indexOf("?"));
 					}
-					var reSSCC=new RegExp("(\\/(?:sscc|00)\\/\\d{18})$");
-					if (reSSCC.test(pathInfo)) {
-						sscc=pathInfo.substr(pathInfo.length-18);
+					var rePath=new RegExp("\\/(sscc|00|gsin|402|ginc|401)\\/(\\d{4}.+?)$");
+					if (rePath.test(pathInfo)) {
+						let code=pathInfo.match(rePath)[1].toUpperCase();
+						if (digits.test(code)) {
+							code=c[code];
+						}			
+						rv.code=code;	
+						rv.value=pathInfo.match(rePath)[2];
+					} else {
+						rv.code="";
+						rv.value="";
 					}
 				}
-				return sscc;
+				return rv;
 			},
 			uriStemExtracted: function() {
 				var uriStem="";
@@ -384,10 +439,12 @@ td.value {font-weight: 400; font-size: 1.5em;}
 					} else {
 						pathInfo = this.gs1dlURI2decode.substr(0,this.gs1dlURI2decode.indexOf("?"));
 					}
-					var reSSCC1=new RegExp("(\\/sscc\\/\\d{18})$");
-					var reSSCC2=new RegExp("(\\/00\\/\\d{18})$");
-					if (reSSCC1.test(pathInfo)) { uriStem = pathInfo.substr(0,pathInfo.length-24)}
-					if (reSSCC2.test(pathInfo)) { uriStem = pathInfo.substr(0,pathInfo.length-22)}
+					var rePath=new RegExp("\\/(sscc|00|gsin|402|ginc|401)\\/(\\d{4}.+?)$");
+					
+					if (rePath.test(pathInfo)) { 
+						let l=pathInfo.match(rePath)[0].length;
+						uriStem = pathInfo.substr(0,pathInfo.length-l);
+					}						
 				}
 				return uriStem;				
 			},
@@ -417,9 +474,12 @@ td.value {font-weight: 400; font-size: 1.5em;}
 			gs1dlURI: function() {
 				var uriStem=this.uriStem.replace(/\/$/,"");
 				var qs=this.queryString.replace(/\%20/g,"+");
-				var dl = uriStem+"/00/"+this.sscc;
-				if (qs !== "") {
-				  dl+="?"+qs;
+				var dl = "";
+				if (this.primaryValue !== "") {
+					dl = uriStem+"/"+this.primaryAIobj.code+"/"+this.primaryValue;
+					if (qs !== "") {
+					  dl+="?"+qs;
+					}
 				}
 				this.generateQR(dl);
 				this.gs1dlURI2decode = dl;
