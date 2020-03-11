@@ -163,7 +163,7 @@ input#decode {float: right; }
 
 	<table id="inputData">
 	<tbody>
-	<tr><td><select v-model="primary" @change="clearPrimaryIdentifierValues"><option v-for="ex in s4tPrimaryIdentifiers" v-bind:value="ex.label">{{ex.definition}}</option></select></td><td colspan="2"><input class="maxWidth" type="text" v-model="primaryValue"></td><td><input type="button" value="demo" @click="demoData2(primaryAIobj.example)"></td></tr>
+	<tr><td>SSCC</td><td colspan="2"><input class="maxWidth" type="text" v-model="primaryValue"></td><td><input type="button" value="demo" @click="demoData2(primaryAIobj.example)"></td></tr>
 	<tr><td>URI stem</td><td colspan="4"><input class="maxWidth" type="text" v-model="uriStem"></td></tr>
 	<tr><td></td><td></td><td></td><td>S4T Code</td></tr>
 	</tbody>
