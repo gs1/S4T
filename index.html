@@ -3,6 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script src="qrcode.js"></script>
 <script language="javascript">
 
 var s4tPrimaryIdentifiers=[
@@ -120,6 +121,9 @@ var mode=0;
 
 var zeroToFive=["0","1","2","3","4","5"];
 
+
+
+
 </script>
 
 <style type="text/css">
@@ -135,25 +139,36 @@ tr.otherIdentifiers { background-color: #FFCC99;}
 tr.measurements { background-color: #D9D9D9;}
 div#gs1DigitalLink {float: right; width: 45vw;}
 div#gs1DigitalLinkDecode {float: left; width: 45vw;}
-div#qrCode {float: right; }
 table#inputData {float: left;}
 table#decodedData {float: right;}
 textarea#dlOutput { width: 100%; font-size: 1em; height: 160px;}
 textarea#dlInput { width: 100%; font-size: 1em; height: 160px;}
 td.s4tCode {text-align: center;}
 input.maxWidth {width: 100%;}
-img#qrCode {position: relative; left: calc(22.5vw - 155px);}
+div#theqrcode {position: absolute; bottom: 10%; right: calc(18% - 125px); width: 250px; height: 250px; border: 25px solid white; }
+div#ack {position: absolute; bottom: 2%; left: 55%; width: 50%; height: 1em; text-align: center;}
 div#navbar {width: 100%; height: 1.5em;}
 input.navbutton {width: 49%; text-align: center;  font-weight: 700;}
 input#encode { float: left; }
 input#decode {float: right; }
 .activeButton {background-color: #000099; color: #FFFFFF;}
 .inactiveButton {background-color: #FFFFFF; color: #000099;}
+table#size  tr th {text-align: center;}
+table#size  tr td {text-align: center;}
 </style>
 </head>
 <body>
+	<div id="theqrcode" style="width: 250px; height: 250px;">
+	<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 100%; height: 100%;">
+    <g id="qrcode2"/>
+    </svg>
+	</div>
+
 <div id="app1">
+
 <h1>GS1 Scan4Transport Interactive Demo {{primaryAIobj.code}}</h1>
+
+
 
 <div id="navbar">
 <input button id="encode" class="navbutton" value="ENCODE / GENERATE" @click="setMode(0)" v-bind:class="{ activeButton: (mode==0), inactiveButton: (mode==1) }"/><input button id="decode" class="navbutton" value="DECODE"  @click="setMode(1)" v-bind:class="{ activeButton: (mode==1), inactiveButton: (mode==0) }"/>
@@ -195,13 +210,27 @@ input#decode {float: right; }
 	<div id="gs1DigitalLink">
 	<h2>GS1 Digital Link URI</h2>
 	<textarea id="dlOutput" :value="gs1dlURI" @change="changedDLoutput($event)"></textarea>
-	</div>
-	<div id="qrCode">
-	<h2>QR code (encoding GS1 Digital Link URI)</h2>
-	<img id="qrCode" v-bind:src="qrURI" width="350" height="350"/>
+
+	<h2 style="float:left;">QR code</h2>
+	<table id="size" style="position: absolute; left: 54%; top: 30em;">
+	<tr><th>Module count</th></tr>
+	<tr><td>{{moduleCount}}</td></tr>
+	<tr><th>Minimum size</th></tr>
+	<tr><td>{{symbolSizeMinimum}} mm</td></tr>
+	<tr><th>Target size</th></tr>
+	<tr><td>{{symbolSizeTarget}} mm</td></tr>
+	<tr><th>Maximum size</th></tr>
+	<tr><td>{{symbolSizeMaximum}} mm</td></tr>
+	</table>
+
+
 	</div>
 
+	<div id="ack">QR generated using <a href="https://github.com/davidshimjs/qrcodejs/" target="_blank">https://github.com/davidshimjs/qrcodejs/</a></div>
+
 </div>
+
+
 <div v-if="mode==1">
 	<p>Enter a GS1 Digital Link URI to decode S4T data.</p>
 
@@ -257,6 +286,17 @@ input#decode {float: right; }
 	var primary="SSCC";
 	var primaryValue="";
 
+var el=document.getElementById("qrcode2");
+console.log(JSON.stringify(el));
+var qrcode = new QRCode(el, {
+				width: 250,
+				height: 250,
+				useSVG: true,
+				colorDark : "#000000",
+				colorLight : "#ffffff",
+				correctLevel : QRCode.CorrectLevel.L
+			});
+
 
 	var app1 = new Vue({
 		el: "#app1",
@@ -269,12 +309,11 @@ input#decode {float: right; }
 			primaryValue: primaryValue,
 			uriStem: uriStem,
 			s4tData: s4tData,
-			qrURI: qrURI,
-			blank: qrURI,
 			mode: mode,
 			booleans: booleans,
 			zeroToFive: zeroToFive,
-			gs1dlURI2decode : gs1dlURI2decode
+			gs1dlURI2decode : gs1dlURI2decode,
+			qrcode : qrcode
 		},
 		computed : {
 			primaryAIobj: function() {
@@ -422,19 +461,38 @@ input#decode {float: right; }
 					  dl+="?"+qs;
 					}
 				}
-				this.generateQR(dl);
+				// this.generateQR(dl);
 				this.gs1dlURI2decode = dl;
 				return dl;
 				
+			},
+			moduleCount: function() {
+				if ((this.qrcode !== null) && (this.qrcode._oQRCode !== null)) {
+				return this.qrcode._oQRCode.moduleCount;
+				} else {
+				return 0;
+				}
+			},
+			symbolSizeMinimum: function() {
+				return Math.floor(this.moduleCount * 396)/1000;
+			},
+			symbolSizeTarget: function() {
+				return Math.floor(this.moduleCount * 495)/1000;
+			},
+			symbolSizeMaximum: function() {
+				return Math.floor(this.moduleCount * 743)/1000;
 			}
+			
+			
 		
 		},
 		methods: {
 			changedDLoutput: function(event) {
 				let newValue = event.target.value;
-				this.generateQR(newValue);
+				// this.generateQR(newValue);
 				this.gs1dlURI2decode = newValue;
 				this.gs1dlURI = newValue;
+				
 			},
 		
 			clearPrimaryIdentifierValues: function() {
@@ -490,19 +548,25 @@ input#decode {float: right; }
 			},
 			setMode: function(el) {
 				this.mode=el;
+				var qrc=document.getElementById("theqrcode");
+				if (el==1) {
+					qrc.style.right="";
+					qrc.style.left="calc(18% - 125px)";
+				} else {
+					qrc.style.right="calc(18% - 125px)";
+					qrc.style.left="";
+				}
 			},
 			booleanValue: function(el) {
 				return this.booleans[el];
-			},
-			generateQR: function(el) {
-				if (this.primaryValue !=="") {
-					this.qrURI="https://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl="+encodeURIComponent(el);
-				} else {
-					this.qrURI=this.blank;
-				}
-
+			}		
+		},
+		watch: {
+			gs1dlURI : function(newVal, oldVal){
+				console.log("newVal="+newVal);
+				// this.qrcode.clear();
+				this.qrcode.makeCode(newVal);
 			}
-		
 		}
 		
 		});
