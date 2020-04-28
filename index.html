@@ -12,58 +12,17 @@ var s4tPrimaryIdentifiers=[
 {"code":'402',"label":'GSIN',"grouping":'PrimaryIdentifiers',"datatype":"xsd:string","definition":'Global Shipment Identification Number (GSIN)',"example":"95212340000000012","percentEncoded":false,"pattern":"[0-9]{17}"},
 ];
 
-	/*
 var s4tTerms=[
-{"code":'sc',"label":'Service Code',"grouping":'TransportTaskInformation',"datatype":"xsd:string","definition":'Freight service code specifies if it is a standard, express, overnight, same day service, etc.  This will be unique to the shipper.',"example":"express","percentEncoded":true},
-{"code":'sCN',"label":'Ship to Contact Name',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"Jaco Voorspuij","percentEncoded":true},
-{"code":'sCo',"label":'Ship to Company Name',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"Café Niçoise at GS1 AISBL","percentEncoded":true},
-{"code":'sA1',"label":'Ship to Address 1',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 1)',"example":"Avenue Louise 326","percentEncoded":true},
-{"code":'sA2',"label":'Ship to Address 2',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 2)',"example":"Blue Tower","percentEncoded":true},
-{"code":'sSb',"label":'Ship to Suburb',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Suburb',"example":"Ixelles","percentEncoded":true},
-{"code":'420',"label":'Ship to Post Code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Postcode',"example":"1050","percentEncoded":false},
-{"code":'sLN',"label":'Ship to Locality (town/city)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Locality (town/city)',"example":"Bruxelles","percentEncoded":true},
-{"code":'sRg',"label":'Ship to Region (state/county)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company Region (state/county)',"example":"Brussels-Capital Region","percentEncoded":true},
-{"code":'sCC',"label":'Ship to Country Code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Country',"example":"BE","percentEncoded":false},
-{"code":'sPh',"label":'Ship to phone number',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Contact phone number for the receiver of the freight unit. Used to populate the system when no EDI has been received','example':"+32 2 788 78 00","percentEncoded":false},
-{"code":'dg',"label":'Dangerous Goods Flag',"grouping":'FreightUnitInformation',"datatype":"xsd:boolean","definition":'A flag to indicate if the freight unit contains Dangerous Goods',"example":"N","percentEncoded":false},
-{"code":'mLv',"label":'Authority to leave',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that he/she may leave the transport unit at the destination location. Implies the operator does not need to hand the transport unit over to a person. Also implies no signature from recipient is required.',"example":"N","percentEncoded":false},
-{"code":'rqS',"label":'Signature Required Flag',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that the operator must get a signature from the recipient for having delivered the transport unit to the intended destination. This implies that delivery must be made to a person.',"example":"Y","percentEncoded":false},
-{"code":'dtNB',"label":'Not before Delivery Date Time',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":'In transportation, it is a common business requirement to not deliver before a set date.',"example":"2020-01-18","percentEncoded":false},
-{"code":'dtNA',"label":'Not after Delivery Date Time',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":'In transportation, it is a common business requirement to deliver before a set date.',"example":"2020-01-25","percentEncoded":false},
-{"code":'dtRe',"label":'Release date',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":"Sometimes transport service providers are required to 'hold' transport units for a while before these transport units are allowed to be sent out to recipients.","example":"2020-01-15","percentEncoded":false},
-{"code":'rCo',"label":'Return to Company Name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Company name for the return to address',"example":"GS1 Global Office","percentEncoded":true},
-{"code":'rCN',"label":'Return to Contact Name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Name of the contact freight unit is to be returned to',"example":"Dan Mullen","percentEncoded":true},
-{"code":'rA1',"label":'Return to Address 1',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential street address (Line 1)',"example":"300 Charles Ewing Boulevard","percentEncoded":true},
-{"code":'rA2',"label":'Return to Address 2',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential street address (Line 2)',"example":"Ground Floor Suite","percentEncoded":true},
-{"code":'rSb',"label":'Return to Suburb',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Suburb',"example":"Ewingville","percentEncoded":true},
-{"code":'rPC',"label":'Return to Post Code',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Postcode',"example":"08628","percentEncoded":false},
-{"code":'rLN',"label":'Return to Locality (town/city)',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Locality (town/city)',"example":"Ewing","percentEncoded":true},
-{"code":'rRg',"label":'Return to Region (state/county)',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Region (state/county)',"example":"New Jersey","percentEncoded":true},
-{"code":'rCC',"label":'Return to Country Code',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Country',"example":"US","percentEncoded":false},
-{"code":'401',"label":'GINC',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Global Identification Number for Consignment (GINC)',"example":"9521234ABC12345","percentEncoded":false},
-{"code":'402',"label":'GSIN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Global Shipment Identification Number (GSIN)',"example":"95212340000000012","percentEncoded":false},
-{"code":'403',"label":'Routing code',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Routing Code: AI(403)',"example":"DEF19485","percentEncoded":false},
-{"code":'410',"label":'Ship-to / Deliver-to GLN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Ship-to / Deliver-to GLN',"example":"9529876987658","percentEncoded":false},
-{"code":'413',"label":'Ship-for / Deliver-for GLN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Ship-for / Deliver-for GLN',"example":"9529876567898","percentEncoded":false},
-{"code":'330n',"label":'Logistic Weight (kg)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic weight (kg)',"example":"13.542","unit":"kg","percentEncoded":false},
-{"code":'331n',"label":'Length of first dimension (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Length of first dimension (m)',"example":"0.75","unit":"m","percentEncoded":false},
-{"code":'332n',"label":'Width of second dimension (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Width of second dimension (m)',"example":"0.55","unit":"m","percentEncoded":false},
-{"code":'333n',"label":'Depth, thickness, height (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Depth, thickness, height or third dimension (m)',"example":"0.35","unit":"m","percentEncoded":false},
-{"code":'336n',"label":'Logistic volume (cubic metres)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic volume (cubic metres)',"example":"0.085","unit":"m^3","percentEncoded":false}
-];
-*/
-
-var s4tTerms=[
-{"code":'4300',"label":'Ship-to  / Deliver-to company',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"Café Niçoise at GS1 AISBL","percentEncoded":true},
-{"code":'4301',"label":'Ship-to  / Deliver-to / Deliver-to contact',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"Jaco Voorspuij","percentEncoded":true},
-{"code":'4302',"label":'Ship-to  / Deliver-to address line 1',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 1)',"example":"Avenue Louise 326","percentEncoded":true},
-{"code":'4303',"label":'Ship-to  / Deliver-to address line 2',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 2)',"example":"Blue Tower","percentEncoded":true},
-{"code":'4304',"label":'Ship-to  / Deliver-to suburb',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Suburb',"example":"Ixelles","percentEncoded":true},
-{"code":'4305',"label":'Ship-to  / Deliver-to locality (town/city)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Locality (town/city)',"example":"Bruxelles","percentEncoded":true},
-{"code":'4306',"label":'Ship-to  / Deliver-to region (state/county)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company Region (state/county)',"example":"Brussels-Capital Region","percentEncoded":true},
-{"code":'4307',"label":'Ship-to  / Deliver-to country code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Country',"example":"BE","percentEncoded":false},
-{"code":'420', "label":'Ship-to  / Deliver-to postal code within a single postal authority',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Postcode',"example":"1050","percentEncoded":false},
-{"code":'4308',"label":'Ship-to  / Deliver-to phone number',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Contact phone number for the receiver of the freight unit. Used to populate the system when no EDI has been received','example':"+32 2 788 78 00","percentEncoded":false},
+{"code":'4300',"label":'Ship-to / Deliver-to company',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"Café Niçoise at GS1 AISBL","percentEncoded":true},
+{"code":'4301',"label":'Ship-to / Deliver-to contact',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"Jaco Voorspuij","percentEncoded":true},
+{"code":'4302',"label":'Ship-to / Deliver-to address line 1',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 1)',"example":"Avenue Louise 326","percentEncoded":true},
+{"code":'4303',"label":'Ship-to / Deliver-to address line 2',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 2)',"example":"Blue Tower","percentEncoded":true},
+{"code":'4304',"label":'Ship-to / Deliver-to suburb',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Suburb',"example":"Ixelles","percentEncoded":true},
+{"code":'4305',"label":'Ship-to / Deliver-to locality (town/city)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Locality (town/city)',"example":"Bruxelles","percentEncoded":true},
+{"code":'4306',"label":'Ship-to / Deliver-to region (state/county)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company Region (state/county)',"example":"Brussels-Capital Region","percentEncoded":true},
+{"code":'4307',"label":'Ship-to / Deliver-to country code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Country',"example":"BE","percentEncoded":false},
+{"code":'420', "label":'Ship-to / Deliver-to postal code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Postcode',"example":"1050","percentEncoded":false},
+{"code":'4308',"label":'Ship-to / Deliver-to phone number',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Contact phone number for the receiver of the freight unit. Used to populate the system when no EDI has been received','example':"+32 2 788 78 00","percentEncoded":false},
 {"code":'4310',"label":'Return-to company name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Company name for the return to address',"example":"GS1 Global Office","percentEncoded":true},
 {"code":'4311',"label":'Return-to contact',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Name of the contact freight unit is to be returned to',"example":"Dan Mullen","percentEncoded":true},
 {"code":'4312',"label":'Return-to address line 1',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential street address (Line 1)',"example":"300 Charles Ewing Boulevard","percentEncoded":true},
@@ -92,7 +51,7 @@ var s4tTerms=[
 {"code":'333n',"label":'Depth, thickness, height (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Depth, thickness, height or third dimension (m)',"example":"0.35","unit":"m","percentEncoded":false},
 {"code":'336n',"label":'Logistic volume (cubic metres)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic volume (cubic metres)',"example":"0.085","unit":"m^3","percentEncoded":false}
 ];
-	
+
 
 function filterByGrouping(grouping) {
     return function(element) {
@@ -179,16 +138,17 @@ tr.returnAddress { background-color: #CCCCFF;}
 tr.freightUnitInformation { background-color: #CCFFFF;}
 tr.otherIdentifiers { background-color: #FFCC99;}
 tr.measurements { background-color: #D9D9D9;}
-div#gs1DigitalLink {float: right; width: 45vw;}
-div#gs1DigitalLinkDecode {float: left; width: 45vw;}
+td.label {text-align: right; font-weight: 700;}
+div.qrpanel1 {float: right; width: 49%;}
+div.qrpanel2 {float: left; width: 49%;}
 table#inputData {float: left;}
 table#decodedData {float: right;}
 textarea#dlOutput { width: 100%; font-size: 1em; height: 160px;}
 textarea#dlInput { width: 100%; font-size: 1em; height: 160px;}
 td.s4tCode {text-align: center;}
 input.maxWidth {width: 100%;}
-div#theqrcode {position: absolute; bottom: 10%; right: calc(18% - 125px); width: 250px; height: 250px; border: 25px solid white; }
-div#ack {position: absolute; bottom: 1em; right: 3%; width: 40%; height: 1em; text-align: center;}
+div#theqrcode {position: absolute; top: 50%; right: calc(25% - 150px); width: 250px; height: 250px; border: 25px solid white; }
+div#ack {position: absolute; top: calc(50% + 300px); right: 3%; width: 40%; height: 1em; text-align: center; }
 div#navbar {width: 100%; height: 1.5em;}
 input.navbutton {width: 49%; text-align: center;  font-weight: 700;}
 input#encode { float: left; }
@@ -196,7 +156,8 @@ input#decode {float: right; }
 .activeButton {background-color: #000099; color: #FFFFFF;}
 .inactiveButton {background-color: #FFFFFF; color: #000099;}
 table#size  tr th {text-align: center;}
-table#size  tr td {text-align: center;}
+div#inputform {width: 49%; float: left}
+div#decoded {width: 49%; float: right}
 </style>
 </head>
 <body>
@@ -215,32 +176,32 @@ table#size  tr td {text-align: center;}
 <div id="navbar">
 <input button id="encode" class="navbutton" value="ENCODE / GENERATE" @click="setMode(0)" v-bind:class="{ activeButton: (mode==0), inactiveButton: (mode==1) }"/><input button id="decode" class="navbutton" value="DECODE"  @click="setMode(1)" v-bind:class="{ activeButton: (mode==1), inactiveButton: (mode==0) }"/>
 </div>
-<div v-if="mode==0">
+<div id="inputform" v-if="mode==0">
 	<p>Enter data in the form below to generate a GS1 Digital Link URI and encode it within a QR code.</p>
 
 	<table id="inputData">
 	<tbody>
 	<tr><td>SSCC</td><td colspan="2"><input class="maxWidth" type="text" v-model="primaryValue"></td><td><input type="button" value="demo" @click="demoData2(primaryAIobj.example)"></td></tr>
 	<tr><td>URI stem</td><td colspan="4"><input class="maxWidth" type="text" v-model="uriStem"></td></tr>
-	<tr><td></td><td></td><td></td><td>S4T Code</td></tr>
+	<tr><td></td><td></td><td></td><td style="text-align: center;">AI</td></tr>
 	</tbody>
 	<tbody v-for="ex in otherIdentifiers">
-	<tr class="otherIdentifiers"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="otherIdentifiers"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
 	<tbody v-for="ex in transportTaskInformation">
-	<tr class="transportTaskInfo"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="transportTaskInfo"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
 	<tbody v-for="ex in freightUnitInformation">
-	<tr class="freightUnitInformation"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="freightUnitInformation"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
 	<tbody v-for="ex in shippingAddressInfo">
-	<tr class="shippingAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="shippingAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
 	<tbody v-for="ex in deliveryInstructions">
-	<tr class="deliveryInstructions"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="deliveryInstructions"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
 	<tbody v-for="ex in returnAddressInfo">
-	<tr class="returnAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="returnAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="Y">Yes</option><option value="N">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
 	<tbody v-for="ex in measurements">
 	<tr class="measurements"><td v-bind:title="ex.definition">{{ex.label}}</td><td><input type="text" v-model="s4tData[ex.code]">{{ex.unit}}</td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
@@ -248,39 +209,37 @@ table#size  tr td {text-align: center;}
 	<tbody>
 	</tbody>
 	</table>
+</div>
 
-	<div id="gs1DigitalLink">
+<div class="qrpanel1" v-if="mode==0">
 	<h2>GS1 Digital Link URI</h2>
 	<textarea id="dlOutput" :value="gs1dlURI" @change="changedDLoutput($event)"></textarea>
 
 	<h2 style="float:left;">QR code</h2>
-	<table id="size" style="position: absolute; left: 54%; top: 30em;">
-	<tr><th>Module count</th></tr>
-	<tr><td>{{moduleCount}}</td></tr>
-	<tr><th>Minimum size</th></tr>
-	<tr><td>{{symbolSizeMinimum}} mm</td></tr>
-	<tr><th>Target size</th></tr>
-	<tr><td>{{symbolSizeTarget}} mm</td></tr>
-	<tr><th>Maximum size</th></tr>
-	<tr><td>{{symbolSizeMaximum}} mm</td></tr>
+
+
+	<div id="ack">QR generated using<br/><a href="https://github.com/davidshimjs/qrcodejs/" target="_blank">https://github.com/davidshimjs/qrcodejs/</a><br>
+	<br/>
+	<table id="size" style="width: 80%;">
+	<tr><td class="label">Module count</td><td>{{moduleCount}}</td></tr>
+	<tr><td class="label">Minimum size</td><td>{{symbolSizeMinimum}} mm</td></tr>
+	<tr><td class="label">Target size</td><td>{{symbolSizeTarget}} mm</td></tr>
+	<tr><td class="label">Maximum size</td><td>{{symbolSizeMaximum}} mm</td></tr>
 	</table>
-
-
 	</div>
 
-	<div id="ack">QR generated using <a href="https://github.com/davidshimjs/qrcodejs/" target="_blank">https://github.com/davidshimjs/qrcodejs/</a></div>
+</div> 
 
-</div>
-
-
-<div v-if="mode==1">
+<div class="qrpanel2" v-if="mode==1">
 	<p>Enter a GS1 Digital Link URI to decode S4T data.</p>
 
 	<div id="gs1DigitalLinkDecode">
 	<h2>GS1 Digital Link URI</h2>
 	<textarea id="dlInput" v-model="gs1dlURI2decode"></textarea>
 	</div>
+</div>
 
+<div id="decoded" v-if="mode==1">
 	<table id="decodedData">
 	<tbody>
 	<tr><td><span>{{primaryValueExtracted.code}}</span></td><td colspan="1">{{primaryValueExtracted.value}}</td><td></td></tr>
