@@ -162,7 +162,7 @@ td.value {font-weight: 400; font-size: 1.5em;}
 	<div class="deliveryInstructions">
 	<table class="fullwidth">
 	<tbody v-for="ex in deliveryInstructions">
-	<tr class="deliveryInstructions"><td class="label" v-bind:title="ex.definition">{{ex.label}}</td><td class="value"><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td></tr>
+	<tr class="deliveryInstructions"><td class="label" v-bind:title="ex.definition">{{ex.label}}</td><td class="value"><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:dateTime'">{{gs1date4(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td></tr>
 	</tbody>
 	</table>
 	</div>
@@ -206,6 +206,8 @@ td.value {font-weight: 400; font-size: 1.5em;}
 		{"code":'401',"label":'GINC',"grouping":'PrimaryIdentifiers',"datatype":"xsd:string","definition":'Global Identification Number for Consignment (GINC)',"example":"0614141ABC12345","percentEncoded":false,"pattern":"[0-9]{4}.{0,26}"},
 		{"code":'402',"label":'GSIN',"grouping":'PrimaryIdentifiers',"datatype":"xsd:string","definition":'Global Shipment Identification Number (GSIN)',"example":"06141410000000012","percentEncoded":false,"pattern":"[0-9]{17}"},
 	];
+
+
  
 	var s4tTerms=[
 	{"code":'4300',"label":'Ship-to / Deliver-to company',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"Café Niçoise at GS1 AISBL","percentEncoded":true},
@@ -215,7 +217,7 @@ td.value {font-weight: 400; font-size: 1.5em;}
 	{"code":'4304',"label":'Ship-to / Deliver-to suburb',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Suburb',"example":"Ixelles","percentEncoded":true},
 	{"code":'4305',"label":'Ship-to / Deliver-to locality (town/city)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Locality (town/city)',"example":"Bruxelles","percentEncoded":true},
 	{"code":'4306',"label":'Ship-to / Deliver-to region (state/county)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company Region (state/county)',"example":"Brussels-Capital Region","percentEncoded":true},
-	{"code":'4307',"label":'Ship-to / Deliver-to country code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Country',"example":"BE","percentEncoded":false},
+	{"code":'4307',"label":'Ship-to / Deliver-to country code',"grouping":'ShippingAddressInformation',"datatype":"gs1:CountryCode","definition":'Receiving company/residential Country',"example":"BE","percentEncoded":false},
 	{"code":'420', "label":'Ship-to / Deliver-to postal code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Postcode',"example":"1050","percentEncoded":false},
 	{"code":'4308',"label":'Ship-to / Deliver-to phone number',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Contact phone number for the receiver of the freight unit. Used to populate the system when no EDI has been received','example':"+32 2 788 78 00","percentEncoded":false},
 	{"code":'4310',"label":'Return-to company name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Company name for the return to address',"example":"GS1 Global Office","percentEncoded":true},
@@ -225,15 +227,15 @@ td.value {font-weight: 400; font-size: 1.5em;}
 	{"code":'4314',"label":'Return-to suburb',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Suburb',"example":"Ewingville","percentEncoded":true},
 	{"code":'4315',"label":'Return-to locality (town/city)',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Locality (town/city)',"example":"Ewing","percentEncoded":true},
 	{"code":'4316',"label":'Return-to region (state/county)',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Region (state/county)',"example":"New Jersey","percentEncoded":true},
-	{"code":'4317',"label":'Return-to country code',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Country',"example":"US","percentEncoded":false},
+	{"code":'4317',"label":'Return-to country code',"grouping":'ReturnAddressInformation',"datatype":"gs1:CountryCode","definition":'Return to company/residential Country',"example":"US","percentEncoded":false},
 	{"code":'4318',"label":'Return-to postal code',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential Postcode',"example":"08628","percentEncoded":false},
 	{"code":'4319',"label":'Return-to phone number',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Contact phone number for the receiver of the freight unit. Used to populate the system when no EDI has been received','example':"+32 2 788 78 00","percentEncoded":false},
 	{"code":'4320',"label":'Service code description',"grouping":'TransportTaskInformation',"datatype":"xsd:string","definition":'Freight service code specifies if it is a standard, express, overnight, same day service, etc.  This will be unique to the shipper.',"example":"express","percentEncoded":true},
 	{"code":'4321',"label":'Dangerous goods flag',"grouping":'FreightUnitInformation',"datatype":"xsd:boolean","definition":'A flag to indicate if the freight unit contains Dangerous Goods',"example":"N","percentEncoded":false},
 	{"code":'4322',"label":'Authority to leave',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that he/she may leave the transport unit at the destination location. Implies the operator does not need to hand the transport unit over to a person. Also implies no signature from recipient is required.',"example":"N","percentEncoded":false},
 	{"code":'4323',"label":'Signature required flag',"grouping":'DeliveryInstructions',"datatype":"xsd:boolean","definition":'This indicates to the operator that the operator must get a signature from the recipient for having delivered the transport unit to the intended destination. This implies that delivery must be made to a person.',"example":"Y","percentEncoded":false},
-	{"code":'4324',"label":'Not before delivery date time',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":'In transportation, it is a common business requirement to not deliver before a set date.',"example":"2020-01-18","percentEncoded":false},
-	{"code":'4325',"label":'Not after delivery date time',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":'In transportation, it is a common business requirement to deliver before a set date.',"example":"2020-01-25","percentEncoded":false},
+	{"code":'4324',"label":'Not before delivery date time',"grouping":'DeliveryInstructions',"datatype":"xsd:dateTime","definition":'In transportation, it is a common business requirement to not deliver before a set date.',"example":"2020-01-18","percentEncoded":false},
+	{"code":'4325',"label":'Not after delivery date time',"grouping":'DeliveryInstructions',"datatype":"xsd:dateTime","definition":'In transportation, it is a common business requirement to deliver before a set date.',"example":"2020-01-25","percentEncoded":false},
 	{"code":'4326',"label":'Release date',"grouping":'DeliveryInstructions',"datatype":"xsd:date","definition":"Sometimes transport service providers are required to 'hold' transport units for a while before these transport units are allowed to be sent out to recipients.","example":"2020-01-15","percentEncoded":false},
 	{"code":'401',"label":'GINC',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Global Identification Number for Consignment (GINC)',"example":"9521234ABC12345","percentEncoded":false},
 	{"code":'402',"label":'GSIN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Global Shipment Identification Number (GSIN)',"example":"95212340000000012","percentEncoded":false},
@@ -539,6 +541,42 @@ td.value {font-weight: 400; font-size: 1.5em;}
 				
 				if (fullyear !== undefined) {
 				rv=doubleDigits[5]+"/"+doubleDigits[3]+"/"+fullyear;
+				}
+				}
+				return rv;
+			},
+			gs1date4: function(gs1Date) {
+				var rv="";
+				var regexDate= new RegExp("^\\d{6}|\\d{8}|\\d{10}$");
+				if (gs1Date !== undefined && regexDate.test(gs1Date)) {
+				var doubleDigits = gs1Date.split(/(\d{2})/);
+				// TODO determine this correctly based on whether >=51 - see Gen Specs
+				var year=parseInt(doubleDigits[1]);
+				
+				var currentYear=new Date().getFullYear().toString();
+				var currentLastYY=parseInt(currentYear.substr(-2));
+				var currentFirstYY=parseInt(currentYear.substr(0,2));
+				
+				var diff=year-currentLastYY;
+				var fullyear=currentFirstYY.toString()+year.toString();
+				if (diff >=51 && diff <= 99) {
+					fullyear=(currentFirstYY-1).toString()+year.toString();
+				}
+				if (diff >= -99 && diff <= -50) {
+					fullyear=(currentFirstYY+1).toString()+year.toString();
+				}
+				
+				var hour="00";
+				var min="00";
+				if (gs1Date.length > 6) {
+				hour=doubleDigits[7];
+				}
+				if (gs1Date.length > 8) {
+				min=doubleDigits[9];
+				}
+				
+				if (fullyear !== undefined) {
+				rv=doubleDigits[5]+"/"+doubleDigits[3]+"/"+fullyear+" "+hour+":"+min;
 				}
 				}
 				return rv;
