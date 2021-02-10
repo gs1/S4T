@@ -1,0 +1,138 @@
+<html>
+<head>
+<style type="text/css">
+body {font-family: Verdana, Geneva, Arial, Helvetica;}
+</style>
+<script src="https://unpkg.com/vue/dist/vue.min.js"></script>
+<script language="javascript">
+
+function isS4TDL(str) {
+	// the parameter str is the URI to be tested, as a potential Scan4Transport GS1 Digital Link URI
+	
+	// this method returns an object with two properties:  
+	// .isS4T , a Boolean that is true if the test string is a Scan4Transport GS1 Digital Link URI
+	// .sscc , an 18-digit numeric string value if an SSCC can be extracted
+	let rv={};
+	
+	// This regular expression matches a GS1 Digital Link URI in which the SSCC is the primary identification key
+	// The URI path information must contain either /00/ followed by 18 digits  or  /sscc/  followed by 18 digits
+	// The 18-digit sequence for the SSCC value is the only capturing group within the regular expression, ([0-9]{18})
+	const regex = RegExp( "^https?:(?:\/\/(?:(?:(?:[^\/?#]*)@)?(?:[^\/?#:]*)(?::(?:[^\/?#]*))?))?(?:(?:[^?#]*)\/(?:00|sscc)\/)([0-9]{18})" );
+	
+	// use the regular expression to attempt to match the test string str and extract values for capture groups.  If it matches, then the second element will contain the SSCC
+	let matches=regex.exec(str);
+	
+	// use the regular expression to attempt to match the test string str.  If it matches, the value of regex.test(str) is true.
+	rv.isS4T = regex.test(str);
+	if (rv.isS4T == true) {
+		// the second element at index 1 will contain the 18-digit value.  Note that this function does not check that the GS1 check digit is valid.
+		rv.sscc = matches[1];
+	} else {
+		// if the string does not match, the SSCC value is set to null
+		rv.sscc=null;
+	}
+	return rv;
+}
+
+
+let str="https://example.com/00/195212342345678908?4300=Caf%C3%A9+Ni%C3%A7oise+at+GS1+AISBL&4301=Jaco+Voorspuij&4320=express&4321=0&401=9521234ABC12345&402=95212340000000012&403=DEF19485&410=9529876987658&413=9529876567898";
+
+// call the function isS4TDL(str) to test if the string is a Scan4Transport GS1 Digital Link URI and if so, to extract the SSCC value
+let result=isS4TDL(str);
+
+// if it's a Scan4Transport GS1 Digital Link URI with an SSCC then result.isS4T is true, otherwise false
+console.log("Is this a Scan4Transport GS1 Digital Link URI? "+(result.isS4T ? "Yes" : "No") );
+
+// if result.isS4T is true, then result.sscc returns the 18-digit SSCC value
+console.log("SSCC : "+result.sscc);
+
+
+
+
+</script>
+</head>
+<body>
+<h1>Test if a URI is a Scan4Transport GS1 Digital Link URI containing an SSCC</h1>
+<div id="app1">
+<p>Enter a URI / URL here to test if it is a Scan4Transport GS1 Digital Link URI:</p>
+<input type="text" v-model="teststring" style="width: 100%;">
+<input type="button" value="Demo - valid S4T URI" @click="demo1"><input type="button" value="Demo - not valid S4T URI" @click="demo2"><input type="button" value="Clear" @click="clear"><br/>
+<hr/>
+<p>Is this a Scan4Transport URI ? : {{(result ? "Yes" : "No")}}</p>
+<p>SSCC: {{sscc}}</p>
+</div>
+<hr/>
+<p>Example JavaScript function and regular expression</p>
+<hr/>
+<pre style="background-color: #FFFFCC;">
+function isS4TDL(str) {
+	// the parameter str is the URI to be tested, as a potential Scan4Transport GS1 Digital Link URI
+	
+	// this method returns an object with two properties:  
+	// .isS4T , a Boolean that is true if the test string is a Scan4Transport GS1 Digital Link URI
+	// .sscc , an 18-digit numeric string value if an SSCC can be extracted
+	let rv={};
+	
+	// This regular expression matches a GS1 Digital Link URI in which the SSCC is the primary identification key
+	// The URI path information must contain either /00/ followed by 18 digits  or  /sscc/  followed by 18 digits
+	// The 18-digit sequence for the SSCC value is the only capturing group within the regular expression, ([0-9]{18})
+	const regex = RegExp( "^https?:(?:\/\/(?:(?:(?:[^\/?#]*)@)?(?:[^\/?#:]*)(?::(?:[^\/?#]*))?))?(?:(?:[^?#]*)\/(?:00|sscc)\/)([0-9]{18})" );
+	
+	// use the regular expression to attempt to match the test string str and extract values for capture groups.  If it matches, then the second element will contain the SSCC
+	let matches=regex.exec(str);
+	
+	// use the regular expression to attempt to match the test string str.  If it matches, the value of regex.test(str) is true.
+	rv.isS4T = regex.test(str);
+	if (rv.isS4T == true) {
+		// the second element at index 1 will contain the 18-digit value.  Note that this function does not check that the GS1 check digit is valid.
+		rv.sscc = matches[1];
+	} else {
+		// if the string does not match, the SSCC value is set to null
+		rv.sscc=null;
+	}
+	return rv;
+}
+</pre>
+
+<script language="javascript">
+
+var teststring="";
+var validDemo = "https://example.com/00/195212342345678908?4300=Caf%C3%A9+Ni%C3%A7oise+at+GS1+AISBL&4301=Jaco+Voorspuij&4320=express&4321=0&401=9521234ABC12345&402=95212340000000012&403=DEF19485&410=9529876987658&413=9529876567898";
+var invalidDemo = "https://example.com/00/19521234234567890?4300=Caf%C3%A9+Ni%C3%A7oise+at+GS1+AISBL&4301=Jaco+Voorspuij&4320=express&4321=0&401=9521234ABC12345&402=95212340000000012&403=DEF19485&410=9529876987658&413=9529876567898";
+
+var app1=new Vue({
+        el: '#app1',
+        // define data - initial display text
+        data: {
+          teststring: teststring,
+          validDemo: validDemo,
+          invalidDemo : invalidDemo
+        },
+        methods: {
+        	demo1 : function() {
+        		this.teststring=this.validDemo;
+        	},
+        	demo2 : function() {
+        		this.teststring=this.invalidDemo;
+        	},
+        	clear : function() {
+        		this.teststring="";
+        	}        
+        },
+        computed: {
+        	result : function() {
+        		return isS4TDL(this.teststring).isS4T;
+        	},
+        	sscc : function() {
+        		return isS4TDL(this.teststring).sscc;
+        	}
+        }
+        
+      })
+
+</script>
+
+</body>
+</html>
+
+
