@@ -3,7 +3,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="qrcode.js"></script>
+<script type="text/javascript" src="dist/bwip-js-min.js"></script>
 <script language="javascript">
 
 var s4tPrimaryIdentifiers=[
@@ -15,6 +15,11 @@ var s4tPrimaryIdentifiers=[
 var countryCodes={"AF":"Afghanistan","AX":"Åland Islands","AL":"Albania","DZ":"Algeria","AS":"American Samoa","AD":"Andorra","AO":"Angola","AI":"Anguilla","AQ":"Antarctica","AG":"Antigua and Barbuda","AR":"Argentina","AM":"Armenia","AW":"Aruba","AU":"Australia","AT":"Austria","AZ":"Azerbaijan","BS":"Bahamas","BH":"Bahrain","BD":"Bangladesh","BB":"Barbados","BY":"Belarus","BE":"Belgium","BZ":"Belize","BJ":"Benin","BM":"Bermuda","BT":"Bhutan","BT":"Bhutan","BO":"Bolivia (Plurinational State of)","BO":"Bolivia (Plurinational State of)","BQ":"Bonaire, Sint Eustatius and Saba","BA":"Bosnia and Herzegovina","BW":"Botswana","BV":"Bouvet Island","BR":"Brazil","IO":"British Indian Ocean Territory","BN":"Brunei Darussalam","BG":"Bulgaria","BF":"Burkina Faso","BI":"Burundi","KH":"Cambodia","CM":"Cameroon","CA":"Canada","CV":"Cabo Verde","KY":"Cayman Islands","CF":"Central African Republic","TD":"Chad","CL":"Chile","CL":"Chile","CN":"China","CX":"Christmas Island","CC":"Cocos (Keeling) Islands","CO":"Colombia","CO":"Colombia","KM":"Comoros","CG":"Congo","CD":"Congo (Democratic Republic of the)","CK":"Cook Islands","CR":"Costa Rica","CI":"Côte d'Ivoire","HR":"Croatia","CU":"Cuba","CU":"Cuba","CW":"Curaçao","CY":"Cyprus","CZ":"Czech Republic","DK":"Denmark","DJ":"Djibouti","DM":"Dominica","DO":"Dominican Republic","EC":"Ecuador","EG":"Egypt","SV":"El Salvador","SV":"El Salvador","GQ":"Equatorial Guinea","ER":"Eritrea","EE":"Estonia","ET":"Ethiopia","FK":"Falkland Islands (Malvinas)","FO":"Faroe Islands","FJ":"Fiji","FI":"Finland","FR":"France","GF":"French Guiana","PF":"French Polynesia","TF":"French Southern Territories","GA":"Gabon","GM":"Gambia","GE":"Georgia","DE":"Germany","GH":"Ghana","GI":"Gibraltar","GR":"Greece","GL":"Greenland","GD":"Grenada","GP":"Guadeloupe","GU":"Guam","GT":"Guatemala","GG":"Guernsey","GN":"Guinea","GW":"Guinea-Bissau","GY":"Guyana","HT":"Haiti","HT":"Haiti","HM":"Heard Island and McDonald Islands","VA":"Holy See","HN":"Honduras","HK":"Hong Kong","HU":"Hungary","IS":"Iceland","IN":"India","ID":"Indonesia","IR":"Iran (Islamic Republic of)","IQ":"Iraq","IE":"Ireland","IM":"Isle of Man","IL":"Israel","IT":"Italy","JM":"Jamaica","JP":"Japan","JE":"Jersey","JO":"Jordan","KZ":"Kazakhstan","KE":"Kenya","KI":"Kiribati","KP":"Korea (Democratic People's Republic of)","KR":"Korea (Republic of)","KW":"Kuwait","KG":"Kyrgyzstan","LA":"Lao People's Democratic Republic","LV":"Latvia","LB":"Lebanon","LS":"Lesotho","LS":"Lesotho","LR":"Liberia","LY":"Libya","LI":"Liechtenstein","LT":"Lithuania","LU":"Luxembourg","MO":"Macao","MK":"Macedonia (the former Yugoslav Republic of)","MG":"Madagascar","MW":"Malawi","MY":"Malaysia","MV":"Maldives","ML":"Mali","MT":"Malta","MH":"Marshall Islands","MQ":"Martinique","MR":"Mauritania","MU":"Mauritius","YT":"Mayotte","MX":"Mexico","MX":"Mexico","FM":"Micronesia (Federated States of)","MD":"Moldova (Republic of)","MC":"Monaco","MN":"Mongolia","ME":"Montenegro","MS":"Montserrat","MA":"Morocco","MZ":"Mozambique","MM":"Myanmar","NA":"Namibia","NA":"Namibia","NR":"Nauru","NP":"Nepal","NL":"Netherlands","NC":"New Caledonia","NZ":"New Zealand","NI":"Nicaragua","NE":"Niger","NG":"Nigeria","NU":"Niue","NF":"Norfolk Island","MP":"Northern Mariana Islands","NO":"Norway","OM":"Oman","PK":"Pakistan","PW":"Palau","PS":"Palestine, State of","PA":"Panama","PA":"Panama","PG":"Papua New Guinea","PY":"Paraguay","PE":"Peru","PH":"Philippines","PN":"Pitcairn","PL":"Poland","PT":"Portugal","PR":"Puerto Rico","QA":"Qatar","RE":"Réunion","RO":"Romania","RU":"Russian Federation","RW":"Rwanda","BL":"Saint Barthélemy","SH":"Saint Helena, Ascension and Tristan da Cunha","KN":"Saint Kitts and Nevis","LC":"Saint Lucia","MF":"Saint Martin (French part)","PM":"Saint Pierre and Miquelon","VC":"Saint Vincent and the Grenadines","WS":"Samoa","SM":"San Marino","ST":"Sao Tome and Principe","SA":"Saudi Arabia","SN":"Senegal","RS":"Serbia","SC":"Seychelles","SL":"Sierra Leone","SG":"Singapore","SX":"Sint Maarten (Dutch part)","SK":"Slovakia","SI":"Slovenia","SB":"Solomon Islands","SO":"Somalia","ZA":"South Africa","GS":"South Georgia and the South Sandwich Islands","SS":"South Sudan","ES":"Spain","LK":"Sri Lanka","SD":"Sudan","SR":"Suriname","SJ":"Svalbard and Jan Mayen","SZ":"Swaziland","SE":"Sweden","CH":"Switzerland","SY":"Syrian Arab Republic","TW":"Taiwan, Province of China","TJ":"Tajikistan","TZ":"Tanzania, United Republic of","TH":"Thailand","TL":"Timor-Leste","TG":"Togo","TK":"Tokelau","TO":"Tonga","TT":"Trinidad and Tobago","TN":"Tunisia","TR":"Turkey","TM":"Turkmenistan","TC":"Turks and Caicos Islands","TV":"Tuvalu","UG":"Uganda","UA":"Ukraine","AE":"United Arab Emirates","GB":"United Kingdom of Great Britain and Northern Ireland","US":"United States of America","UM":"United States Minor Outlying Islands","UY":"Uruguay","UY":"Uruguay","UZ":"Uzbekistan","VU":"Vanuatu","VE":"Venezuela (Bolivarian Republic of)","VN":"Viet Nam","VG":"Virgin Islands (British)","VI":"Virgin Islands (U.S.)","WF":"Wallis and Futuna","EH":"Western Sahara","YE":"Yemen","ZM":"Zambia","ZW":"Zimbabwe"};
 
 var s4tTerms=[
+{"code":'330n',"label":'Logistic Weight (kg)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic weight (kg)',"example":"13.542","unit":"kg","percentEncoded":false},
+{"code":'331n',"label":'Length of first dimension (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Length of first dimension (m)',"example":"0.75","unit":"m","percentEncoded":false},
+{"code":'332n',"label":'Width of second dimension (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Width of second dimension (m)',"example":"0.55","unit":"m","percentEncoded":false},
+{"code":'333n',"label":'Depth, thickness, height (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Depth, thickness, height or third dimension (m)',"example":"0.35","unit":"m","percentEncoded":false},
+{"code":'336n',"label":'Logistic volume (cubic metres)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic volume (cubic metres)',"example":"0.085","unit":"m^3","percentEncoded":false},
 {"code":'4300',"label":'Ship-to / Deliver-to company',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"Café Niçoise at GS1 AISBL","percentEncoded":true},
 {"code":'4301',"label":'Ship-to / Deliver-to contact',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Name of the company and/or per receiving the freight unit',"example":"Jaco Voorspuij","percentEncoded":true},
 {"code":'4302',"label":'Ship-to / Deliver-to address line 1',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential street address (Line 1)',"example":"Avenue Louise 326","percentEncoded":true},
@@ -23,7 +28,7 @@ var s4tTerms=[
 {"code":'4305',"label":'Ship-to / Deliver-to locality (town/city)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Locality (town/city)',"example":"Bruxelles","percentEncoded":true},
 {"code":'4306',"label":'Ship-to / Deliver-to region (state/county)',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company Region (state/county)',"example":"Brussels-Capital Region","percentEncoded":true},
 {"code":'4307',"label":'Ship-to / Deliver-to country code',"grouping":'ShippingAddressInformation',"datatype":"gs1:CountryCode","definition":'Receiving company/residential Country',"example":"BE","percentEncoded":false},
-{"code":'420', "label":'Ship-to / Deliver-to postal code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Postcode',"example":"1050","percentEncoded":false},
+{"code":'420',"label":'Ship-to / Deliver-to postal code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Postcode',"example":"1050","percentEncoded":false},
 {"code":'4308',"label":'Ship-to / Deliver-to phone number',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Contact phone number for the receiver of the freight unit. Used to populate the system when no EDI has been received','example':"+32 2 788 78 00","percentEncoded":false},
 {"code":'4310',"label":'Return-to company name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Company name for the return to address',"example":"GS1 Global Office","percentEncoded":true},
 {"code":'4311',"label":'Return-to contact',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Name of the contact freight unit is to be returned to',"example":"Dan Mullen","percentEncoded":true},
@@ -46,14 +51,19 @@ var s4tTerms=[
 {"code":'402',"label":'GSIN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Global Shipment Identification Number (GSIN)',"example":"95212340000000012","percentEncoded":false},
 {"code":'403',"label":'Routing code',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Routing Code: AI(403)',"example":"DEF19485","percentEncoded":false},
 {"code":'410',"label":'Ship-to / Deliver-to GLN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Ship-to / Deliver-to GLN',"example":"9529876987658","percentEncoded":false},
-{"code":'413',"label":'Ship-for / Deliver-for GLN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Ship-for / Deliver-for GLN',"example":"9529876567898","percentEncoded":false},
-{"code":'330n',"label":'Logistic Weight (kg)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic weight (kg)',"example":"13.542","unit":"kg","percentEncoded":false},
-{"code":'331n',"label":'Length of first dimension (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Length of first dimension (m)',"example":"0.75","unit":"m","percentEncoded":false},
-{"code":'332n',"label":'Width of second dimension (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Width of second dimension (m)',"example":"0.55","unit":"m","percentEncoded":false},
-{"code":'333n',"label":'Depth, thickness, height (m)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Depth, thickness, height or third dimension (m)',"example":"0.35","unit":"m","percentEncoded":false},
-{"code":'336n',"label":'Logistic volume (cubic metres)',"grouping":'Measurements',"datatype":"gs1:Measurement","definition":'Logistic volume (cubic metres)',"example":"0.085","unit":"m^3","percentEncoded":false}
+{"code":'413',"label":'Ship-for / Deliver-for GLN',"grouping":'OtherIdentifiers',"datatype":"xsd:string","definition":'Ship-for / Deliver-for GLN',"example":"9529876567898","percentEncoded":false}
 ];
 
+
+var demoAddresses=[
+{"label":"JP - GS1 Japan","4300":"GS1 Japan","4302":"Place Canada, 7-3-37 Akasaka","4304":"Minato-ku","4305":"Tokyo","420":"107-0052","4307":"JP"},
+{"label":"FR - GS1 France","4300":"GS1 France","4302":"21, boulevard Haussmann","4305":"Paris","420":"75009","4307":"FR"},
+{"label":"FR - Transport LAMBOLLEY","4300":"Transport LAMBOLLEY","4302":"Zone Industrielle des feuilles, Zone A","4303":"21 Rue des entrepôts","4305":"SEYSSUEL","420":"38200","4307":"FR"},
+{"label":"IE - GS1 Ireland","4300":"GS1 Ireland","4302":"2nd Floor, The Merrion Centre","4303":"Nutley Lane","4304":"Donnybrook","4305":"Dublin 4","4306":"County Dublin","420":"D04KF62","4307":"IE"},
+{"label":"US - GS1","4300":"GS1","4302":"300 Charles Ewing Blvd.","4304":"Ewing Township","420":"08628","4307":"US"},
+{"label":"AU - GS1 Australia","4300":"GS1 Australia Melbourne Office","4302":"Nexus Business Park","4303":"8 Nexus Court","4304":"Mulgrave","4305":"Melbourne","420":"3170","4306":"Victoria","4307":"AU"},
+{"label":"BR - GS1 Brasil","4300":"GS1 Brasil","4302":"Av. 9 de Julho, 3183","4303":"Apt 125","4304":"Jardim Paulista","4305":"São Paulo","420":"CEP 01407-000","4306":"SP","4307":"BR"}
+];
 
 function filterByGrouping(grouping) {
     return function(element) {
@@ -117,6 +127,7 @@ function processS4Tarray(s4tTermsF) {
 			obj[element.code]=element;
 	});
 	rv.orderedKeys=orderedKeys;
+
 	rv.obj=obj;
 	return rv;
 }
@@ -149,12 +160,14 @@ div.qrpanel1 {float: right; width: 49%;}
 div.qrpanel2 {float: left; width: 49%;}
 table#inputData {float: left;}
 table#decodedData {float: right;}
-textarea#dlOutput { width: 100%; font-size: 1em; height: 160px;}
-textarea#dlInput { width: 100%; font-size: 1em; height: 160px;}
+textarea#dlOutput { width: 100%; font-size: 1em; height: 140px; overflow-y: scroll;}
+textarea#elsOutput { width: 100%; font-size: 1em; height: 140px; overflow-y: scroll;}
+textarea#dlInput { width: 100%; font-size: 1em; height: 140px; overflow-y: scroll;}
+textarea#elsInput { width: 100%; font-size: 1em; height: 140px; overflow-y: scroll;}
 td.s4tCode {text-align: center;}
 input.maxWidth {width: 100%;}
-div#theqrcode {position: absolute; top: 50%; right: calc(25% - 150px); width: 250px; height: 250px; border: 25px solid white; }
-div#ack {position: absolute; top: calc(50% + 300px); right: 3%; width: 40%; height: 1em; text-align: center; }
+div#symbol2D {position: absolute; top: 38%; left: 50%; width: 50%; }
+div#stats {position: absolute;  right: 2%; width: 48%; height: 1em; text-align: center; }
 div#navbar {width: 100%; height: 1.5em;}
 input.navbutton {width: 49%; text-align: center;  font-weight: 700;}
 input#encode { float: left; }
@@ -164,14 +177,13 @@ input#decode {float: right; }
 table#size  tr th {text-align: center;}
 div#inputform {width: 49%; float: left}
 div#decoded {width: 49%; float: right}
+canvas {border: 16px solid white; background-color: #FFFFFF; margin-left: auto; margin-right: auto; }
+.hidden {display: none;}
+.selectCode {font-size: 1.2em; font-weight: 700;}
+
 </style>
 </head>
 <body>
-	<div id="theqrcode" style="width: 250px; height: 250px;">
-	<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="width: 100%; height: 100%;">
-    <g id="qrcode2"/>
-    </svg>
-	</div>
 
 <div id="app1">
 
@@ -183,9 +195,16 @@ div#decoded {width: 49%; float: right}
 <input button id="encode" class="navbutton" value="ENCODE / GENERATE" @click="setMode(0)" v-bind:class="{ activeButton: (mode==0), inactiveButton: (mode==1) }"/><input button id="decode" class="navbutton" value="DECODE"  @click="setMode(1)" v-bind:class="{ activeButton: (mode==1), inactiveButton: (mode==0) }"/>
 </div>
 <div id="inputform" v-if="mode==0">
-	<p>Enter data in the form below to generate a GS1 Digital Link URI and encode it within a QR code.</p>
 
 	<table id="inputData">
+	<tbody>
+	<tr><td>Choose 2D symbol</td><td colspan="3">
+	<select v-model="whichCode" class="selectCode">
+	<option value="0">QR code with GS1 Digital Link URI</option>
+	<option value="1">GS1 Data Matrix with element string</option>
+	</select>	
+	</td></tr>
+	</tbody>
 	<tbody>
 	<tr><td>SSCC</td><td colspan="2"><input class="maxWidth" type="text" v-model="primaryValue"></td><td><input type="button" value="demo" @click="demoData2(primaryAIobj.example)"></td></tr>
 	<tr><td>URI stem</td><td colspan="4"><input class="maxWidth" type="text" v-model="uriStem"></td></tr>
@@ -200,11 +219,25 @@ div#decoded {width: 49%; float: right}
 	<tbody v-for="ex in freightUnitInformation">
 	<tr class="freightUnitInformation"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="1">Yes</option><option value="0">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
+	<tbody>
+	<tr class="shippingAddress"><td><b>Ship-to / deliver-to address</b></td><td colspan="3" style="text-align:right;"><select @change="demoShipAddress" v-model="shipDemo">
+	<option value="shipDemoMenu">Pull down to select a demo value</option>
+	<option value="clear">Clear the shipping address demo</option>
+	<option v-for="ex in demoAddresses" :value="JSON.stringify(ex)">{{ex.label}}</option>
+	</select></td></tr>
+	</tbody>
 	<tbody v-for="ex in shippingAddressInfo">
 	<tr class="shippingAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="1">Yes</option><option value="0">No</option></select></span><span v-if="s4tObj.obj[ex.code].datatype=='gs1:CountryCode'"><select v-model="s4tData[ex.code]"><option v-for="el in Object.keys(countryCodes)" :value="el">{{countryCodes[el]}}</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	</tbody>
 	<tbody v-for="ex in deliveryInstructions">
 	<tr class="deliveryInstructions"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:dateTime'"><input class="date" type="datetime-local" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="1">Yes</option><option value="0">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	</tbody>
+	<tbody>
+	<tr class="returnAddress"><td><b>Return address</b></td><td colspan="3" style="text-align:right;"><select  @change="demoReturnAddress" v-model="returnDemo">
+	<option value="returnDemoMenu">Pull down to select a demo value</option>
+	<option value="clear">Clear the return address demo</option>
+	<option v-for="ex in demoAddresses" :value="JSON.stringify(ex)">{{ex.label}}</option>
+	</select></td></tr>
 	</tbody>
 	<tbody v-for="ex in returnAddressInfo">
 	<tr class="returnAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="1">Yes</option><option value="0">No</option></select></span><span v-if="s4tObj.obj[ex.code].datatype=='gs1:CountryCode'"><select v-model="s4tData[ex.code]"><option v-for="el in Object.keys(countryCodes)" :value="el">{{countryCodes[el]}}</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
@@ -215,33 +248,26 @@ div#decoded {width: 49%; float: right}
 	<tbody>
 	</tbody>
 	</table>
+
 </div>
 
 <div class="qrpanel1" v-if="mode==0">
-	<h2>GS1 Digital Link URI</h2>
-	<textarea id="dlOutput" :value="gs1dlURI" @change="changedDLoutput($event)"></textarea>
-
-	<h2 style="float:left;">QR code</h2>
-
-
-	<div id="ack">QR generated using<br/><a href="https://github.com/davidshimjs/qrcodejs/" target="_blank">https://github.com/davidshimjs/qrcodejs/</a><br>
-	<br/>
-	<table id="size" style="width: 80%;">
-	<tr><td class="label">Module count</td><td>{{moduleCount}}</td></tr>
-	<tr><td class="label">Minimum size</td><td>{{symbolSizeMinimum}} mm</td></tr>
-	<tr><td class="label">Target size</td><td>{{symbolSizeTarget}} mm</td></tr>
-	<tr><td class="label">Maximum size</td><td>{{symbolSizeMaximum}} mm</td></tr>
-	</table>
-	</div>
+	<textarea id="dlOutput" v-if="whichCode==0" :value="gs1dlURI" @change="changedDLoutput($event)"></textarea>
+	<textarea id="elsOutput" v-if="whichCode==1" :value="gs1elementString" @change="changedESoutput($event)"></textarea>
+	<p class="hidden"><input id="selection" type="text" v-model="selectedCanvas"/></p>
+	<div v-if="this.primaryValue !== ''" id="stats">{{moduleCount}}x{{moduleCount}} modules. Minimum/Target size: {{symbolSizeMinimum}} mm. Maximum size {{symbolSizeMaximum}} mm.</div>
 
 </div> 
 
 <div class="qrpanel2" v-if="mode==1">
-	<p>Enter a GS1 Digital Link URI to decode S4T data.</p>
-
+	<select v-model="whichCode" class="selectCode">
+	<option value="0">QR code with GS1 Digital Link URI</option>
+	<option value="1">GS1 Data Matrix with element string</option>
+	</select>
+	<p class="hidden"><input id="selection2" type="text" v-model="selectedCanvas2"/></p>
 	<div id="gs1DigitalLinkDecode">
-	<h2>GS1 Digital Link URI</h2>
-	<textarea id="dlInput" v-model="gs1dlURI2decode"></textarea>
+	<textarea v-if="whichCode==0" id="dlInput" v-model="gs1dlURI2decode"></textarea>
+	<textarea v-if="whichCode==1" id="elsInput" v-model="gs1els2decode"></textarea>
 	</div>
 </div>
 
@@ -282,6 +308,12 @@ div#decoded {width: 49%; float: right}
 </div>
 </div>
 
+<div id="symbol2D">
+<canvas id="canvas0"></canvas>
+<canvas id="canvas1"></canvas>
+<p style="text-align:center;">2D barcode generated using <a href="https://github.com/metafloor/bwip-js/" target="_blank">https://github.com/metafloor/bwip-js/</a></p>
+</div>
+
 <script language="javascript">
 
 	var sscc="";
@@ -289,20 +321,34 @@ div#decoded {width: 49%; float: right}
 	var s4tData={};
 	var qrURI="blank.png";
 	var gs1dlURI2decode="";
+	var gs1els2decode="";
 	var booleans={"1":"Yes","0":"No",undefined:""};
 	var primary="SSCC";
 	var primaryValue="";
+	var shipDemo="shipDemoMenu";
+	var returnDemo="returnDemoMenu";
 
-var el=document.getElementById("qrcode2");
 
-var qrcode = new QRCode(el, {
-				width: 250,
-				height: 250,
-				useSVG: true,
-				colorDark : "#000000",
-				colorLight : "#ffffff",
-				correctLevel : QRCode.CorrectLevel.L
+
+function updateCanvas(elem,code,stringToEncode) {
+	try {
+		// The return value is the canvas element
+		let canvas = bwipjs.toCanvas(elem, {
+				bcid:        code,       // Barcode type
+				text:        stringToEncode,    // Text to encode
+				scaleX:       2,               // 3x scaling factor
+				scaleY:       2,               // 3x scaling factor
+				includetext: false,            // Show human-readable text
+				textxalign:  'center',        // Always good to set this
 			});
+		let el=document.getElementById(elem);
+		return el.width/4;		
+	} catch (e) {
+		// `e` may be a string or Error object
+	}
+
+}
+
 
 
 	var app1 = new Vue({
@@ -320,7 +366,11 @@ var qrcode = new QRCode(el, {
 			booleans: booleans,
 			zeroToFive: zeroToFive,
 			gs1dlURI2decode : gs1dlURI2decode,
-			qrcode : qrcode
+			gs1els2decode : gs1els2decode,
+			shipDemo : shipDemo,
+			returnDemo : returnDemo,
+			demoAddresses : demoAddresses,
+			whichCode : 0
 		},
 		computed : {
 			primaryAIobj: function() {
@@ -358,30 +408,45 @@ var qrcode = new QRCode(el, {
 			},
 
 			queryStringExtracted: function() {
-				var uri=this.gs1dlURI2decode;
 				var qso={};
-				if (uri !== undefined && uri !== null && uri !== "") {
-					if (uri.indexOf(" ")> -1) {
-						uri=uri.substr(0,uri.indexOf(" "));
-					}
-					var qsa=uri.substr(1-(0-uri.indexOf("?"))).split("&");
-					qsa.forEach(function(el) {
-						if (el !== undefined) {
-							var kv=el.split("=");
-							if (kv[1] !== null & kv[1] !== undefined) {
-							var v=kv[1].replace(/\+/g,"%20");
-							qso[kv[0]]=decodeURIComponent(v);
-							}
+				if (this.whichCode ==0 ){
+					var uri=this.gs1dlURI2decode;
+					if (uri !== undefined && uri !== null && uri !== "") {
+						if (uri.indexOf(" ")> -1) {
+							uri=uri.substr(0,uri.indexOf(" "));
 						}
-					});
+						var qsa=uri.substr(1-(0-uri.indexOf("?"))).split("&");
+						qsa.forEach(function(el) {
+							if (el !== undefined) {
+								var kv=el.split("=");
+								if (kv[1] !== null & kv[1] !== undefined) {
+								var v=kv[1].replace(/\+/g,"%20");
+								qso[kv[0]]=decodeURIComponent(v);
+								}
+							}
+						});
+					}
+				} else {
+					let els=this.gs1els2decode;
+					if (els !== undefined && els !== null && els !== "") {
+						let splits=els.match(/(\(\d{2,4}\))|([^(]+)/g);
+						for (let i=0; i<splits.length/2; i++) {
+							let k=splits[i*2].replace(/[()]/g,"");
+							let v=splits[1+i*2].replace(/\+/g,"%20");
+							qso[k]=decodeURIComponent(v);;
+						}
+						
+					}
 				}
 				return qso;
 			},
 			
 			s4tDetected : function() {
 				let rv="No";
+				if (this.whichCode ==0) {
 				if (this.gs1dlURI2decode.slice(-4) == "&s4t") {
 				rv="Yes";
+				}
 				}
 				return rv;
 			},
@@ -391,43 +456,61 @@ var qrcode = new QRCode(el, {
 				let rv={};
 				let c={"00":"SSCC","402":"GSIN","401":"GINC"};
 				let digits=new RegExp("^\\d+$");
-				if (this.gs1dlURI2decode !== undefined && this.gs1dlURI2decode !== null && this.gs1dlURI2decode !== "") {
-					var inq = this.gs1dlURI2decode.indexOf("?");
-					if (inq== -1) {
-						pathInfo = this.gs1dlURI2decode;
-					} else {
-						pathInfo = this.gs1dlURI2decode.substr(0,this.gs1dlURI2decode.indexOf("?"));
+				if (this.whichCode ==0) {
+				
+					if (this.gs1dlURI2decode !== undefined && this.gs1dlURI2decode !== null && this.gs1dlURI2decode !== "") {
+						var inq = this.gs1dlURI2decode.indexOf("?");
+						if (inq== -1) {
+							pathInfo = this.gs1dlURI2decode;
+						} else {
+							pathInfo = this.gs1dlURI2decode.substr(0,this.gs1dlURI2decode.indexOf("?"));
+						}
+						var rePath=new RegExp("\\/(sscc|00|gsin|402|ginc|401)\\/(\\d{4}.+?)$");
+						if (rePath.test(pathInfo)) {
+							let code=pathInfo.match(rePath)[1].toUpperCase();
+							if (digits.test(code)) {
+								code=c[code];
+							}			
+							rv.code=code;	
+							rv.value=pathInfo.match(rePath)[2];
+						} else {
+							rv.code="";
+							rv.value="";
+						}
 					}
-					var rePath=new RegExp("\\/(sscc|00|gsin|402|ginc|401)\\/(\\d{4}.+?)$");
-					if (rePath.test(pathInfo)) {
-						let code=pathInfo.match(rePath)[1].toUpperCase();
-						if (digits.test(code)) {
-							code=c[code];
-						}			
-						rv.code=code;	
-						rv.value=pathInfo.match(rePath)[2];
-					} else {
-						rv.code="";
-						rv.value="";
-					}
+				
+				} else {
+						let qso={};
+						let els=this.gs1els2decode;
+						let splits=els.match(/(\(\d{2,4}\))|([^(]+)/g);
+						for (let i=0; i<splits.length/2; i++) {
+							let k=splits[i*2].replace(/[()]/g,"");
+							let v=splits[1+i*2].replace(/\+/g,"%20");
+							qso[k]=decodeURIComponent(v);;
+						}
+						rv.code="SSCC";
+						rv.value=qso["00"];
+				
 				}
 				return rv;
 			},
 			uriStemExtracted: function() {
 				var uriStem="";
-				if (this.gs1dlURI2decode !== undefined && this.gs1dlURI2decode !== null && this.gs1dlURI2decode !== "") {
-					var inq = this.gs1dlURI2decode.indexOf("?");
-					if (inq== -1) {
-						pathInfo = this.gs1dlURI2decode;
-					} else {
-						pathInfo = this.gs1dlURI2decode.substr(0,this.gs1dlURI2decode.indexOf("?"));
-					}
-					var rePath=new RegExp("\\/(sscc|00|gsin|402|ginc|401)\\/(\\d{4}.+?)$");
+				if (this.whichCode ==0 ) {
+					if (this.gs1dlURI2decode !== undefined && this.gs1dlURI2decode !== null && this.gs1dlURI2decode !== "") {
+						var inq = this.gs1dlURI2decode.indexOf("?");
+						if (inq== -1) {
+							pathInfo = this.gs1dlURI2decode;
+						} else {
+							pathInfo = this.gs1dlURI2decode.substr(0,this.gs1dlURI2decode.indexOf("?"));
+						}
+						var rePath=new RegExp("\\/(sscc|00|gsin|402|ginc|401)\\/(\\d{4}.+?)$");
 					
-					if (rePath.test(pathInfo)) { 
-						let l=pathInfo.match(rePath)[0].length;
-						uriStem = pathInfo.substr(0,pathInfo.length-l);
-					}						
+						if (rePath.test(pathInfo)) { 
+							let l=pathInfo.match(rePath)[0].length;
+							uriStem = pathInfo.substr(0,pathInfo.length-l);
+						}						
+					}
 				}
 				return uriStem;				
 			},
@@ -478,12 +561,78 @@ var qrcode = new QRCode(el, {
 				return dl;
 				
 			},
-			moduleCount: function() {
-				if ((this.qrcode !== null) && (this.qrcode._oQRCode !== null)) {
-				return this.qrcode._oQRCode.moduleCount;
-				} else {
-				return 0;
+			gs1elementString: function() {
+				let rv="";
+				if (this.primaryValue !== "") {
+				rv="(00)"+this.primaryValue;
+				s4to=JSON.parse(this.s4tDataJSON);
+				kvPairs=[];
+				s4tObj.orderedKeys.forEach(function(k) {
+				let xc = this.primaryAIobj;
+				
+				
+					if ((s4to.hasOwnProperty(k)) && (s4to[k] !== "")) {
+						var valToEncode="";
+						if (this.s4tObj.obj[k].datatype=="xsd:date") {							
+							valToEncode=gs1date(s4to[k]);
+						}
+						if (this.s4tObj.obj[k].datatype=="xsd:dateTime") {							
+							valToEncode=gs1dateTime(s4to[k]);
+						}
+						if (this.s4tObj.obj[k].datatype=="gs1:Measurement") {
+							var rv=gs1measurement(s4to[k]);
+							valToEncode = rv.sixdigit;
+							k=k.replace("n",rv.ndp);
+						}
+						if (valToEncode ==  "") {
+							valToEncode=encodeURIComponent(s4to[k]);
+						}
+						
+					    kvPairs.push("("+k+")"+valToEncode);
+					}
+
+
+
+				});
+				rv+=kvPairs.join("");
 				}
+				this.gs1els2decode = rv;
+				return rv;
+			},
+			
+			"res1" : function() {
+			    if (this.mode==0) {
+				return updateCanvas("canvas0","qrcode",this.gs1dlURI);
+				} else {
+				if (this.gs1dlURI2decode == "") {  this.gs1dlURI2decode = this.gs1dlURI }
+				return updateCanvas("canvas0","qrcode",this.gs1dlURI2decode);
+				}
+			},
+			"res2" : function() {
+			    if (this.mode==0) {
+				return updateCanvas("canvas1","gs1datamatrix",this.gs1elementString);
+				} else {
+				if (this.gs1els2decode == "") { this.gs1els2decode = this.gs1elementString; }
+	 			return updateCanvas("canvas1","gs1datamatrix",this.gs1els2decode);
+				}
+			},
+			"selectedCanvas": function() {
+			  let toHide = 1-this.whichCode;
+			  let elh=document.getElementById("canvas"+toHide);
+			  let els=document.getElementById("canvas"+this.whichCode);
+			  elh.style.display="none";
+			  els.style.display="block";
+			  return "canvas"+this.whichCode;
+			},
+			
+			"selectedCanvas2": function() {
+				return this.res1+this.res2+this.selectedCanvas+this.gs1elementString+this.gs1dlURI;
+			},
+			
+			
+			moduleCount: function() {
+				if (this.whichCode==0) { return this.res1; }
+				if (this.whichCode==1) { return this.res2; }
 			},
 			symbolSizeMinimum: function() {
 				return Math.floor(this.moduleCount * 743)/1000;
@@ -499,6 +648,41 @@ var qrcode = new QRCode(el, {
 		
 		},
 		methods: {
+		    demoShipAddress: function(event) {
+		    	let newValue = event.target.value;
+				let a=["4300","4301","4302","4303","4304","4305","4306","4307","420"];
+		    	if (newValue == "clear") {
+		    		for (i in a) {
+						Vue.set(app1.s4tData,a[i],"");
+		    		}
+		    	} else {
+					let o = JSON.parse(newValue);
+					let i;
+					for (i in a) {
+					Vue.set(app1.s4tData,a[i],"");
+					Vue.set(app1.s4tData,a[i],o[a[i]]);
+					}
+		    	}
+		    },
+
+		    demoReturnAddress: function(event) {
+		    	let newValue = event.target.value;
+				let a=["4300","4301","4302","4303","4304","4305","4306","4307","420"];
+				let m={"4300":"4310","4301":"4311","4302":"4312","4303":"4313","4304":"4314","4305":"4315","4306":"4316","4307":"4317","420":"4318"};
+		    	if (newValue == "clear") {
+		    		for (i in a) {
+						Vue.set(app1.s4tData,m[a[i]],"");
+		    		}
+		    	} else {
+					let o = JSON.parse(newValue);
+					let i;
+					for (i in a) {
+					Vue.set(app1.s4tData,m[a[i]],"");
+					Vue.set(app1.s4tData,m[a[i]],o[a[i]]);
+					}
+		    	}
+		    },
+		
 			changedDLoutput: function(event) {
 				let newValue = event.target.value;
 				// this.generateQR(newValue);
@@ -599,23 +783,16 @@ var qrcode = new QRCode(el, {
 			
 			setMode: function(el) {
 				this.mode=el;
-				var qrc=document.getElementById("theqrcode");
+				var qrc=document.getElementById("symbol2D");
 				if (el==1) {
-					qrc.style.right="";
-					qrc.style.left="calc(18% - 125px)";
+					qrc.style.left="0%";
 				} else {
-					qrc.style.right="calc(18% - 125px)";
-					qrc.style.left="";
+					qrc.style.left="50%";
 				}
 			},
 			booleanValue: function(el) {
 				return this.booleans[el];
 			}		
-		},
-		watch: {
-			gs1dlURI : function(newVal, oldVal){
-				this.qrcode.makeCode(newVal);
-			}
 		}
 		
 		});
