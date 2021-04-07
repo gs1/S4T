@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Encoding non-Latin characters</title>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<style type="text/css" rel="stylesheet">
+body {font-family: Verdana, Geneva, Arial, Helvetica}
+</style>
+</head>
+<body>
+<div id="app1">
+
+<h1>GS1 Scan4Transport : encoding non-Latin characters</h1>
+
+<p><b>Input:</b> a company name or street address (possibly containing non-Latin characters)</p>
+<input type="text" v-model="input" style="width: 80%; float:left;"><span sstyle="float:right;"><input type="button" value="Demo" @click="demo"><input type="button" value="Clear" @click="clear"></span>
+<p>Input was <input type="text" v-model="inputCount" readonly style="color: #666666;"> characters</p>
+<br/>
+<br/>
+<p><b>Output:</b> the same value after percent-encoding (and use of '+' as an alternative for %20 for space)</p>
+<input type="text" v-model="output" style="width: 80%;"><br/>
+<p>Requires <input type="text" v-model="charCount" readonly style="background-color: #FFFFCC; font-weight: 700; font-size: 1.2em;"> characters</p>
+
+
+<script language="javascript">
+	let input="";
+	
+
+	var app1 = new Vue({
+		el: "#app1",
+		data : {
+			input: input,
+		},
+		computed : {
+			output: function() {
+				return encodeURIComponent(this.input).replace(/\%20/g,"+");
+			},
+			charCount : function() {
+				return this.output.length;
+			},
+			inputCount : function() {
+				return this.input.length;
+			}
+		},
+		methods : {
+		   clear: function() {
+		   		this.input="";
+		   },
+		   demo : function() {
+		   		this.input="Königstraße 329";
+		   }
+		}
+	});
+	
+</script>		
+
+</body>
+</html>
