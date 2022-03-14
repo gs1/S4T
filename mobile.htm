@@ -132,6 +132,8 @@ td.value {font-weight: 400; font-size: 1.5em;}
 	<table class="fullwidth">
 	<tbody v-for="ex in shippingAddressInfo">
 	<tr class="shippingAddress"><td class="label" v-bind:title="ex.definition" v-if="l==1">{{ex.label}}</td><td class="boldvalue"><span v-if="s4tObj.obj[ex.code].datatype=='gs1:CountryCode'">{{countryCodes[queryStringExtracted[ex.code]]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td></tr>
+	<tr class="shippingAddress" v-if="ex.geocode == true"><td></td><td>Lat: {{decodedLat}}<br/>Lon: {{decodedLon}}</td><td></td></tr>
+	<tr class="shippingAddress" v-if="ex.geocode == true"><td></td><td><span v-if="osMapLink"><a :href="osMapLink" target="_blank">View on OpenStreetMap</a></td><td></td></tr>
 	</tbody>
 	</table>
 	</div>
@@ -220,6 +222,7 @@ td.value {font-weight: 400; font-size: 1.5em;}
 	{"code":'4307',"label":'Ship-to / Deliver-to country code',"grouping":'ShippingAddressInformation',"datatype":"gs1:CountryCode","definition":'Receiving company/residential Country',"example":"BE","percentEncoded":false},
 	{"code":'420', "label":'Ship-to / Deliver-to postal code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Postcode',"example":"1050","percentEncoded":false},
 	{"code":'4308',"label":'Ship-to / Deliver-to phone number',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Contact phone number for the receiver of the freight unit. Used to populate the system when no EDI has been received','example':"+32 2 788 78 00","percentEncoded":false},
+	{"code":'4309',"label":'Ship-to / Deliver-to geocode',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'20-digit geocode representing WGS84 latitude,/longitude for ship-to/deliver-to location','example':"14220219500001282028","percentEncoded":false,"geocode":true},
 	{"code":'4310',"label":'Return-to company name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Company name for the return to address',"example":"GS1 Global Office","percentEncoded":true},
 	{"code":'4311',"label":'Return-to contact',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Name of the contact freight unit is to be returned to',"example":"Dan Mullen","percentEncoded":true},
 	{"code":'4312',"label":'Return-to address line 1',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential street address (Line 1)',"example":"300 Charles Ewing Boulevard","percentEncoded":true},
@@ -300,6 +303,68 @@ td.value {font-weight: 400; font-size: 1.5em;}
 		return rv;
 	}
 
+	function latlon2geocode(lat,lon) {
+
+		function pad10(str) {
+			return "0".repeat(10-str.length)+str;
+		}
+
+		let rv="";
+		if ((lat!=="") && (lon !=="")) {
+			let la=parseFloat(lat);
+			let lo=parseFloat(lon);
+		
+			if (lo < 0) {
+			lo+=360;
+			}
+			la+=90;
+
+			let lat7=Math.floor(la*1e7+0.499);
+			let lon7=Math.floor(lo*1e7+0.499);
+
+			rv= pad10(lat7.toString())+pad10(lon7.toString());
+		}
+		return rv;
+	}
+
+	function geocode2latlon(geocode) {
+
+		function truncateAfter7Digits(str) {
+			let re=new RegExp('^([-]?\\d+\\.\\d{7})(\\d+)$');
+			if (re.test(str)) {
+				let arr = re.exec(str);
+				return arr[1];
+			} else {
+				return str;
+			}
+		}
+
+		let re=new RegExp('^[0-9]{20}$');
+		if ( (geocode !=="") && (re.test(geocode)) ) {
+			let clat=geocode.substr(0,10);
+			let clon=geocode.substr(10,10);
+
+			let lat=(parseInt(clat)-900000000)/1e7;
+			let lon=parseInt(clon)/1.00000000e7;
+			if (lon > 180) {
+			lon -=360;
+			}
+				
+			return {"lat":truncateAfter7Digits(lat.toString()),"lon":truncateAfter7Digits(lon.toString())};
+		} else {
+			return {}
+		}
+	}
+
+	function osmMapURL(lat,lon) {
+		if ((lat!=="")&&(lon!=="")){
+			return "https://www.openstreetmap.org/?mlat="+lat+"+&mlon="+lon+"#map=18/"+lat+"/"+lon;
+		} else {
+			return "";
+		}
+	}
+
+
 	function processS4Tarray(s4tTerms) {
 		var orderedKeys=[];
 		var obj={};
@@ -349,6 +414,29 @@ td.value {font-weight: 400; font-size: 1.5em;}
 		  }
 		},
 		computed : {
+			decodedGeo : function() {
+				let g = this.queryStringExtracted['4309'];
+				return geocode2latlon(g);				
+			},
+			decodedLat : function() {
+				if (this.decodedGeo.hasOwnProperty("lat")) {
+					return this.decodedGeo.lat;
+				} else {
+					return "";
+				}
+			},
+			decodedLon : function() {
+				if (this.decodedGeo.hasOwnProperty("lon")) {
+					return this.decodedGeo.lon;
+				} else {
+					return "";
+				}
+			},
+			osMapLink : function() {
+				return osmMapURL(this.decodedLat,this.decodedLon);
+			},
+
+
 			s4tObj : function() {
 				return processS4Tarray(this.s4tTerms);
 			},

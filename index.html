@@ -30,6 +30,7 @@ var s4tTerms=[
 {"code":'4307',"label":'Ship-to / Deliver-to country code',"grouping":'ShippingAddressInformation',"datatype":"gs1:CountryCode","definition":'Receiving company/residential Country',"example":"BE","percentEncoded":false},
 {"code":'420',"label":'Ship-to / Deliver-to postal code',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Receiving company/residential Postcode',"example":"1050","percentEncoded":false},
 {"code":'4308',"label":'Ship-to / Deliver-to phone number',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'Contact phone number for the receiver of the freight unit. Used to populate the system when no EDI has been received','example':"+32 2 788 78 00","percentEncoded":false},
+{"code":'4309',"label":'Ship-to / Deliver-to geocode',"grouping":'ShippingAddressInformation',"datatype":"xsd:string","definition":'20-digit geocode representing WGS84 latitude,/longitude for ship-to/deliver-to location','example':"14220219500001282028","percentEncoded":false,"geocode":true},
 {"code":'4310',"label":'Return-to company name',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Company name for the return to address',"example":"GS1 Global Office","percentEncoded":true},
 {"code":'4311',"label":'Return-to contact',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Name of the contact freight unit is to be returned to',"example":"Dan Mullen","percentEncoded":true},
 {"code":'4312',"label":'Return-to address line 1',"grouping":'ReturnAddressInformation',"datatype":"xsd:string","definition":'Return to company/residential street address (Line 1)',"example":"300 Charles Ewing Boulevard","percentEncoded":true},
@@ -56,13 +57,13 @@ var s4tTerms=[
 
 
 var demoAddresses=[
-{"label":"JP - GS1 Japan","4300":"GS1 Japan","4301":"ヨッシー","4302":"9F, Shin Aoyama Bldg., East","4303":"1-1-1, Minami Aoyama","4304":"Minato-ku","4305":"Tokyo","420":"107-0062","4307":"JP"},
-{"label":"FR - GS1 France","4300":"GS1 France","4302":"21, boulevard Haussmann","4305":"Paris","420":"75009","4307":"FR"},
+{"label":"JP - GS1 Japan","4300":"GS1 Japan","4301":"ヨッシー","4302":"9F, Shin Aoyama Bldg., East","4303":"1-1-1, Minami Aoyama","4304":"Minato-ku","4305":"Tokyo","420":"107-0062","4307":"JP","lat":"35.6724794","lon":"139.7247291"},
+{"label":"FR - GS1 France","4300":"GS1 France","4302":"21, boulevard Haussmann","4305":"Paris","420":"75009","4307":"FR","lat":"48.8725873","lon":"2.333899"},
 {"label":"FR - Transport LAMBOLLEY","4300":"Transport LAMBOLLEY","4302":"Zone Industrielle des feuilles, Zone A","4303":"21 Rue des entrepôts","4305":"SEYSSUEL","420":"38200","4307":"FR"},
-{"label":"IE - GS1 Ireland","4300":"GS1 Ireland","4302":"2nd Floor, The Merrion Centre","4303":"Nutley Lane","4304":"Donnybrook","4305":"Dublin 4","4306":"County Dublin","420":"D04KF62","4307":"IE"},
-{"label":"US - GS1","4300":"GS1","4302":"300 Charles Ewing Blvd.","4305":"Ewing Township","420":"08628","4307":"US"},
-{"label":"AU - GS1 Australia","4300":"GS1 Australia Melbourne Office","4302":"Nexus Business Park","4303":"8 Nexus Court","4304":"Mulgrave","4305":"Melbourne","420":"3170","4306":"Victoria","4307":"AU"},
-{"label":"BR - GS1 Brasil","4300":"GS1 Brasil","4302":"Av. 9 de Julho, 3183","4303":"Apt 125","4304":"Jardim Paulista","4305":"São Paulo","420":"CEP 01407-000","4306":"SP","4307":"BR"}
+{"label":"IE - GS1 Ireland","4300":"GS1 Ireland","4302":"2nd Floor, The Merrion Centre","4303":"Nutley Lane","4304":"Donnybrook","4305":"Dublin 4","4306":"County Dublin","420":"D04KF62","4307":"IE","lat":"53.3186585","lon":"-6.2134748"},
+{"label":"US - GS1","4300":"GS1","4302":"300 Charles Ewing Blvd.","4305":"Ewing Township","420":"08628","4307":"US","lat":"40.2867254","lon":"-74.7893725"},
+{"label":"AU - GS1 Australia","4300":"GS1 Australia Melbourne Office","4302":"Nexus Business Park","4303":"8 Nexus Court","4304":"Mulgrave","4305":"Melbourne","420":"3170","4306":"Victoria","4307":"AU","lat":"-37.9089017","lon":"145.1592176"},
+{"label":"BR - GS1 Brasil","4300":"GS1 Brasil","4302":"Av. 9 de Julho, 3183","4303":"Apt 125","4304":"Jardim Paulista","4305":"São Paulo","420":"CEP 01407-000","4306":"SP","4307":"BR","lat":"-23.5680013","lon":"-46.6596382"}
 ];
 
 function filterByGrouping(grouping) {
@@ -118,6 +119,70 @@ function gs1measurement(val) {
 	return rv;
 }
 
+
+function latlon2geocode(lat,lon) {
+
+	function pad10(str) {
+		return "0".repeat(10-str.length)+str;
+	}
+
+	let rv="";
+	if ((lat!=="") && (lon !=="")) {
+		let la=parseFloat(lat);
+		let lo=parseFloat(lon);
+		
+		if (lo < 0) {
+		lo+=360;
+		}
+		la+=90;
+
+		let lat7=Math.floor(la*1e7+0.499);
+		let lon7=Math.floor(lo*1e7+0.499);
+
+		rv= pad10(lat7.toString())+pad10(lon7.toString());
+	}
+	return rv;
+}
+
+function geocode2latlon(geocode) {
+
+	function truncateAfter7Digits(str) {
+		let re=new RegExp('^([-]?\\d+\\.\\d{7})(\\d+)$');
+		if (re.test(str)) {
+			let arr = re.exec(str);
+			return arr[1];
+		} else {
+			return str;
+		}
+	}
+
+	let re=new RegExp('^[0-9]{20}$');
+	if ( (geocode !=="") && (re.test(geocode)) ) {
+		let clat=geocode.substr(0,10);
+		let clon=geocode.substr(10,10);
+
+		let lat=(parseInt(clat)-900000000)/1e7;
+		let lon=parseInt(clon)/1.00000000e7;
+		if (lon > 180) {
+		lon -=360;
+		}
+				
+		return {"lat":truncateAfter7Digits(lat.toString()),"lon":truncateAfter7Digits(lon.toString())};
+	} else {
+		return {}
+	}
+}
+
+function osmMapURL(lat,lon) {
+	if ((lat!=="")&&(lon!=="")){
+		return "https://www.openstreetmap.org/?mlat="+lat+"+&mlon="+lon+"#map=18/"+lat+"/"+lon;
+	} else {
+		return "";
+	}
+}
+
+
+
 function processS4Tarray(s4tTermsF) {
 	var orderedKeys=[];
 	var obj={};
@@ -139,7 +204,8 @@ var mode=0;
 
 var zeroToFive=["0","1","2","3","4","5"];
 
-
+var shipToLat="";
+var shipToLon="";
 
 
 </script>
@@ -227,7 +293,10 @@ canvas {border: 16px solid white; background-color: #FFFFFF; margin-left: auto; 
 	</select></td></tr>
 	</tbody>
 	<tbody v-for="ex in shippingAddressInfo">
-	<tr class="shippingAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="1">Yes</option><option value="0">No</option></select></span><span v-if="s4tObj.obj[ex.code].datatype=='gs1:CountryCode'"><select v-model="s4tData[ex.code]"><option v-for="el in Object.keys(countryCodes)" :value="el">{{countryCodes[el]}}</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="shippingAddress" v-if="ex.geocode!==true"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="1">Yes</option><option value="0">No</option></select></span><span v-if="s4tObj.obj[ex.code].datatype=='gs1:CountryCode'"><select v-model="s4tData[ex.code]"><option v-for="el in Object.keys(countryCodes)" :value="el">{{countryCodes[el]}}</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="shippingAddress" v-if="ex.geocode==true"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="shipToGeo" class="maxWidth"></span></td><td><input type="button" value="demo" @click="demoDataLatLon()"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="shippingAddress" v-if="ex.geocode==true"><td></td><td colspan="2" style="text-align:right;">WGS84 Latitude&nbsp;<input type="text" v-model="shipToLat"><td></td></tr>
+	<tr class="shippingAddress" v-if="ex.geocode==true"><td></td><td colspan="2" style="text-align:right;">WGS84 Longitude&nbsp;<input type="text" v-model="shipToLon"><td></td></tr>
 	</tbody>
 	<tbody v-for="ex in deliveryInstructions">
 	<tr class="deliveryInstructions"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:dateTime'"><input class="date" type="datetime-local" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="1">Yes</option><option value="0">No</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
@@ -290,6 +359,8 @@ canvas {border: 16px solid white; background-color: #FFFFFF; margin-left: auto; 
 	</tbody>
 	<tbody v-for="ex in shippingAddressInfo">
 	<tr class="shippingAddress"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='gs1:CountryCode'">{{countryCodes[queryStringExtracted[ex.code]]}}</span></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="shippingAddress" v-if="ex.geocode == true"><td></td><td>Lat: {{decodedLat}}<br/>Lon: {{decodedLon}}</td><td></td></tr>
+	<tr class="shippingAddress" v-if="ex.geocode == true"><td></td><td><span v-if="osMapLink"><a :href="osMapLink" target="_blank">View on OpenStreetMap</a></td><td></td></tr>
 	</tbody>
 	<tbody v-for="ex in deliveryInstructions">
 	<tr class="deliveryInstructions"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'">{{queryStringExtracted[ex.code]}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'">{{gs1date3(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:dateTime'">{{gs1date4(queryStringExtracted[ex.code])}}</span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'">{{booleanValue(queryStringExtracted[ex.code])}}</span></td><td class="s4tCode">{{ex.code}}</td></tr>
@@ -368,12 +439,42 @@ function updateCanvas(elem,code,stringToEncode) {
 			gs1dlURI2decode : gs1dlURI2decode,
 			gs1els2decode : gs1els2decode,
 			shipDemo : shipDemo,
+			shipToLat : shipToLat,
+			shipToLon : shipToLon,
 			returnDemo : returnDemo,
 			demoAddresses : demoAddresses,
 			whichCode : 0
 		  }
 		},
 		computed : {
+			decodedGeo : function() {
+				let g = this.queryStringExtracted['4309'];
+				return geocode2latlon(g);				
+			},
+			decodedLat : function() {
+				if (this.decodedGeo.hasOwnProperty("lat")) {
+					return this.decodedGeo.lat;
+				} else {
+					return "";
+				}
+			},
+			decodedLon : function() {
+				if (this.decodedGeo.hasOwnProperty("lon")) {
+					return this.decodedGeo.lon;
+				} else {
+					return "";
+				}
+			},
+			
+			osMapLink : function() {
+				return osmMapURL(this.decodedLat,this.decodedLon);
+			},
+		
+			shipToGeo : function() {
+				let g=latlon2geocode(this.shipToLat, this.shipToLon);
+				this.s4tData['4309']=g;
+				return g;
+			},		
 			primaryAIobj: function() {
 				return this.s4tPrimaryIdentifiers.filter(filterByLabel(this.primary))[0];
 			},
@@ -649,6 +750,12 @@ function updateCanvas(elem,code,stringToEncode) {
 		
 		},
 		methods: {
+			demoDataLatLon: function(event) {
+				this.shipToLat="52.2021950";
+				this.shipToLon="0.1282028";
+			},
+		
+		
 		    demoShipAddress: function(event) {
 		    	let newValue = event.target.value;
 				let a=["4300","4301","4302","4303","4304","4305","4306","4307","420"];
@@ -656,12 +763,21 @@ function updateCanvas(elem,code,stringToEncode) {
 		    		for (i in a) {
 		    			this.s4tData[a[i]]="";
 		    		}
+					this.shipToLat = "";
+					this.shipToLon = "";		    			
 		    	} else {
 					let o = JSON.parse(newValue);
 					let i;
 					for (i in a) {
 		    			this.s4tData[a[i]]="";
 		    			this.s4tData[a[i]]=o[a[i]];
+					}
+					if ((o.hasOwnProperty("lat")) && (o.hasOwnProperty("lon")) && (o.lat !== "") && (o.lon !== "")) {
+						this.shipToLat = o.lat;
+						this.shipToLon = o.lon;
+					} else {
+						this.shipToLat = "";
+						this.shipToLon = "";
 					}
 		    	}
 		    },
@@ -796,7 +912,7 @@ function updateCanvas(elem,code,stringToEncode) {
 			}		
 		}
 		
-		}).mount("#app1");;
+		}).mount("#app1");
 
 
 
