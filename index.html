@@ -294,7 +294,7 @@ canvas {border: 16px solid white; background-color: #FFFFFF; margin-left: auto; 
 	</tbody>
 	<tbody v-for="ex in shippingAddressInfo">
 	<tr class="shippingAddress" v-if="ex.geocode!==true"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="1">Yes</option><option value="0">No</option></select></span><span v-if="s4tObj.obj[ex.code].datatype=='gs1:CountryCode'"><select v-model="s4tData[ex.code]"><option v-for="el in Object.keys(countryCodes)" :value="el">{{countryCodes[el]}}</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
-	<tr class="shippingAddress" v-if="ex.geocode==true"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="shipToGeo" class="maxWidth"></span></td><td><input type="button" value="demo" @click="demoDataLatLon()"></td><td class="s4tCode">{{ex.code}}</td></tr>
+	<tr class="shippingAddress" v-if="ex.geocode==true"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" :value="shipToGeo" class="maxWidth" @keyup="calcLatLon($event)" ></span></td><td><input type="button" value="demo" @click="demoDataLatLon()"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	<tr class="shippingAddress" v-if="ex.geocode==true"><td></td><td colspan="2" style="text-align:right;">WGS84 Latitude&nbsp;<input type="text" v-model="shipToLat"><td></td></tr>
 	<tr class="shippingAddress" v-if="ex.geocode==true"><td></td><td colspan="2" style="text-align:right;">WGS84 Longitude&nbsp;<input type="text" v-model="shipToLon"><td></td></tr>
 	</tbody>
@@ -471,9 +471,13 @@ function updateCanvas(elem,code,stringToEncode) {
 			},
 		
 			shipToGeo : function() {
-				let g=latlon2geocode(this.shipToLat, this.shipToLon);
-				this.s4tData['4309']=g;
-				return g;
+				if ((this.shipToLat !== "") && (this.shipToLon !== "")) {
+					let g=latlon2geocode(this.shipToLat, this.shipToLon);
+					this.s4tData['4309']=g;
+					return g;
+				} else {
+					return "";
+				}
 			},		
 			primaryAIobj: function() {
 				return this.s4tPrimaryIdentifiers.filter(filterByLabel(this.primary))[0];
@@ -750,6 +754,17 @@ function updateCanvas(elem,code,stringToEncode) {
 		
 		},
 		methods: {
+		
+			calcLatLon: function(event) {
+				let newVal=event.target.value;
+				let re=new RegExp("^[0-9]{20}$");
+				if (re.test(newVal)) {
+					let o=geocode2latlon(newVal);				
+					this.shipToLat=o.lat;
+					this.shipToLon=o.lon;
+				}
+			},
+		
 			demoDataLatLon: function(event) {
 				this.shipToLat="52.2021950";
 				this.shipToLon="0.1282028";
