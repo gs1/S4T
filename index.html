@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel='stylesheet' href='https://unpkg.com/leaflet@1.2.0/dist/leaflet.css'>
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 <script type="text/javascript" src="dist/bwip-js-min.js"></script>
 <script language="javascript">
@@ -232,7 +233,7 @@ textarea#dlInput { width: 100%; font-size: 1em; height: 140px; overflow-y: scrol
 textarea#elsInput { width: 100%; font-size: 1em; height: 140px; overflow-y: scroll;}
 td.s4tCode {text-align: center;}
 input.maxWidth {width: 100%;}
-div#symbol2D {position: absolute; top: calc(9em + 145px); left: 50%; width: 50%; }
+div#symbol2D {position: absolute; top: calc(9em + 155px); left: 50%; width: 50%; }
 div#stats {position: absolute;  right: 2%; width: 48%; height: 1em; text-align: center; }
 div#navbar {width: 100%; height: 1.5em;}
 input.navbutton {width: 49%; text-align: center;  font-weight: 700;}
@@ -247,16 +248,29 @@ canvas {border: 16px solid white; background-color: #FFFFFF; margin-left: auto; 
 .hidden {display: none;}
 .selectCode {font-size: 1.2em; font-weight: 700;}
 
+.geocode  {width: 20em; background-color: #FFFFCC;}
+#map { width:calc(100% - 100px); height: 500px; }
+.showing {visibility: show; height:500px;} 
+.hidden {visibility: hidden;  height: 0px;} 
+.showmap {background-color: #00FF00; font-weight: 700; border-radius: 12px;}
+.hidemap {background-color: #FF0000; font-weight: 700; color: #FFFFFF;  border-radius: 12px;}
+
 </style>
 </head>
 <body>
-
-<div id="app1">
+<script src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/Turf.js/5.0.4/turf.min.js'></script>
 
 <h1>GS1 Scan4Transport Interactive Demo</h1>
 
+<div id="mapblock">
+<div class="map_container" :class="showingInputMap ? 'showing' : 'hidden'">
+ <div id="map"></div>
+</div>
+</div>
 
 
+<div id="app1">
 <div id="navbar">
 <input button id="encode" class="navbutton" value="ENCODE / GENERATE" @click="setMode(0)" v-bind:class="{ activeButton: (mode==0), inactiveButton: (mode==1) }"/><input button id="decode" class="navbutton" value="DECODE"  @click="setMode(1)" v-bind:class="{ activeButton: (mode==1), inactiveButton: (mode==0) }"/>
 </div>
@@ -295,7 +309,7 @@ canvas {border: 16px solid white; background-color: #FFFFFF; margin-left: auto; 
 	<tbody v-for="ex in shippingAddressInfo">
 	<tr class="shippingAddress" v-if="ex.geocode!==true"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" v-model="s4tData[ex.code]" class="maxWidth"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:date'"><input class="date" type="date" v-model="s4tData[ex.code]"></span><span v-if="s4tObj.obj[ex.code].datatype=='xsd:boolean'"><select v-model="s4tData[ex.code]"><option value="1">Yes</option><option value="0">No</option></select></span><span v-if="s4tObj.obj[ex.code].datatype=='gs1:CountryCode'"><select v-model="s4tData[ex.code]"><option v-for="el in Object.keys(countryCodes)" :value="el">{{countryCodes[el]}}</option></select></span></td><td><input type="button" value="demo" @click="demoData(ex.code)"></td><td class="s4tCode">{{ex.code}}</td></tr>
 	<tr class="shippingAddress" v-if="ex.geocode==true"><td v-bind:title="ex.definition">{{ex.label}}</td><td><span v-if="s4tObj.obj[ex.code].datatype=='xsd:string'"><input type="text" :value="shipToGeo" class="maxWidth" @keyup="calcLatLon($event)" ></span></td><td><input type="button" value="demo" @click="demoDataLatLon()"></td><td class="s4tCode">{{ex.code}}</td></tr>
-	<tr class="shippingAddress" v-if="ex.geocode==true"><td></td><td colspan="2" style="text-align:right;">WGS84 Latitude&nbsp;<input type="text" v-model="shipToLat"><td></td></tr>
+	<tr class="shippingAddress" v-if="ex.geocode==true"><td><input type="button" @click="toggleInputMap" :value="showingInputMap ? 'Hide map' : 'Show map'" :class="showingInputMap ? 'hidemap' : 'showmap'"></td><td colspan="2" style="text-align:right;">WGS84 Latitude&nbsp;<input type="text" v-model="shipToLat"><td></td></tr>
 	<tr class="shippingAddress" v-if="ex.geocode==true"><td></td><td colspan="2" style="text-align:right;">WGS84 Longitude&nbsp;<input type="text" v-model="shipToLon"><td></td></tr>
 	</tbody>
 	<tbody v-for="ex in deliveryInstructions">
@@ -324,11 +338,12 @@ canvas {border: 16px solid white; background-color: #FFFFFF; margin-left: auto; 
 	<textarea id="dlOutput" v-if="whichCode==0" :value="gs1dlURI" @change="changedDLoutput($event)"></textarea>
 	<textarea id="elsOutput" v-if="whichCode==1" :value="gs1elementString" @change="changedESoutput($event)"></textarea>
 	<p class="hidden"><input id="selection" type="text" v-model="selectedCanvas"/></p>
-	<div v-if="this.primaryValue !== ''" id="stats">{{moduleCount}}x{{moduleCount}} modules. Minimum/Target size: {{symbolSizeMinimum}} mm. Maximum size {{symbolSizeMaximum}} mm.</div>
+	<p v-if="showingInputMap"><input type="button" @click="toggleInputMap" :value="showingInputMap ? 'Click to close the map and see the barcode' : 'Show map'" :class="showingInputMap ? 'hidemap' : 'showmap'"></p>
+	<div v-if="this.primaryValue !== ''" id="stats"><span v-if="!showingInputMap">{{moduleCount}}x{{moduleCount}} modules. Minimum/Target size: {{symbolSizeMinimum}} mm. Maximum size {{symbolSizeMaximum}} mm.</span></div>
 
 </div> 
 
-<div class="qrpanel2" v-if="mode==1">
+<div class="qrpanel2" v-if="((mode==1) && !(showingInputMap))">
 	<select v-model="whichCode" class="selectCode">
 	<option value="0">QR code with GS1 Digital Link URI</option>
 	<option value="1">GS1 Data Matrix with element string</option>
@@ -339,6 +354,7 @@ canvas {border: 16px solid white; background-color: #FFFFFF; margin-left: auto; 
 	<textarea v-if="whichCode==1" id="elsInput" v-model="gs1els2decode"></textarea>
 	</div>
 </div>
+
 
 <div id="decoded" v-if="mode==1">
 	<table id="decodedData">
@@ -377,13 +393,16 @@ canvas {border: 16px solid white; background-color: #FFFFFF; margin-left: auto; 
 
 
 </div>
+
+
+<div id="symbol2D" v-if="((!(showingInputMap) && !(firstLoad))|| firstLoad)">
+<canvas v-show="!showingInputMap && whichCode==0" style="padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block;" id="canvas0"></canvas>
+<canvas v-show="!showingInputMap && whichCode==1" style="padding-left: 0; padding-right: 0; margin-left: auto; margin-right: auto; display: block;" id="canvas1"></canvas>
+<p style="text-align:center;" v-if="!showingInputMap">2D barcode generated using <a href="https://github.com/metafloor/bwip-js/" target="_blank">https://github.com/metafloor/bwip-js/</a><br/>&nbsp;<br/>For questions/feedback about this tool, please contact <a href="mailto:mark.harrison@g1.org">mark.harrison@g1.org</a><br/>&nbsp;<br/><b>Note:</b><br/>Please note that the demo values shown in this tool are shown as human-readable values without the use of percent-encoding that is expected for non-Latin characters and space characters for Application Identifiers (4300)-(4306), (4310)-(4316) and (4320) even when those Application Identifiers and their values are expressed in GS1 element strings.</p>
 </div>
 
-<div id="symbol2D">
-<canvas id="canvas0"></canvas>
-<canvas id="canvas1"></canvas>
-<p style="text-align:center;">2D barcode generated using <a href="https://github.com/metafloor/bwip-js/" target="_blank">https://github.com/metafloor/bwip-js/</a><br/>&nbsp;<br/>For questions/feedback about this tool, please contact <a href="mailto:mark.harrison@g1.org">mark.harrison@g1.org</a><br/>&nbsp;<br/><b>Note:</b><br/>Please note that the demo values shown in this tool are shown as human-readable values without the use of percent-encoding that is expected for non-Latin characters and space characters for Application Identifiers (4300)-(4306), (4310)-(4316) and (4320) even when those Application Identifiers and their values are expressed in GS1 element strings.</p>
 </div>
+
 
 <script language="javascript">
 
@@ -420,11 +439,37 @@ function updateCanvas(elem,code,stringToEncode) {
 
 }
 
+let mapblock=Vue.createApp({
+	data() {
+	   return {
+			showingInputMap : true
+	   }
+	},
+	mounted() {
+		this.showingInputMap=false;
+	},
+	methods : {
+		toggleInputMap: function() {
+			let newval=!this.showingInputMap;
+			this.showingInputMap = newval;
+			if (app1 !==undefined) {
+				app1.showingInputMap = newval;
+				app1.firstLoad=false;			
+				if (newval == false) {
+					app1.toggleSSCC();
+				}
+			}
+			
+		},
+	}
+}).mount("#mapblock");
 
 
-	Vue.createApp({
+let app1=Vue.createApp({
 		data() {
           return {
+            showingInputMap : true,
+            firstLoad : true,
 			s4tTerms: s4tTerms,
 			s4tPrimaryIdentifiers : s4tPrimaryIdentifiers,
 			sscc: sscc,
@@ -443,7 +488,10 @@ function updateCanvas(elem,code,stringToEncode) {
 			shipToLon : shipToLon,
 			returnDemo : returnDemo,
 			demoAddresses : demoAddresses,
-			whichCode : 0
+			whichCode : 0,
+			showingInputMap : false,
+			tempSSCC : "",
+			tempMode : null,
 		  }
 		},
 		computed : {
@@ -472,6 +520,8 @@ function updateCanvas(elem,code,stringToEncode) {
 		
 			shipToGeo : function() {
 				if ((this.shipToLat !== "") && (this.shipToLon !== "")) {
+					recentreMap(this.shipToLat,this.shipToLon,18);
+					showPoint(this.shipToLat, this.shipToLon);
 					let g=latlon2geocode(this.shipToLat, this.shipToLon);
 					this.s4tData['4309']=g;
 					return g;
@@ -726,13 +776,21 @@ function updateCanvas(elem,code,stringToEncode) {
 			  let toHide = 1-this.whichCode;
 			  let elh=document.getElementById("canvas"+toHide);
 			  let els=document.getElementById("canvas"+this.whichCode);
+			  if ((elh !== undefined) && (elh !== null) && (els !== undefined)  && (els !== undefined)) {
 			  elh.style.display="none";
 			  els.style.display="block";
-			  return "canvas"+this.whichCode;
+			  return "canvas"+this.whichCode; 
+			  } else {
+			  return null
+			  }
 			},
 			
 			"selectedCanvas2": function() {
-				return this.res1+this.res2+this.selectedCanvas+this.gs1elementString+this.gs1dlURI;
+				if (this.selectedCanvas !== null) {
+					return this.res1+this.res2+this.selectedCanvas+this.gs1elementString+this.gs1dlURI;
+				} else {
+					return null;
+				}
 			},
 			
 			
@@ -754,6 +812,28 @@ function updateCanvas(elem,code,stringToEncode) {
 		
 		},
 		methods: {
+			toggleSSCC : function() {
+				this.tempMode=this.mode;
+				if (this.mode ==0) {
+				this.tempSSCC=this.primaryValue;
+				this.primaryValue="";
+				}
+				setTimeout(this.restoreSSCC,500);
+			},
+			restoreSSCC : function() {
+				if (this.tempMode==0) {
+					this.primaryValue=this.tempSSCC;
+					this.setMode(0);
+				}
+			},
+
+		
+			toggleInputMap: function() {
+				window.scrollTo(0,0);
+				this.showingInputMap = !this.showingInputMap;
+				mapblock.showingInputMap = this.showingInputMap;
+				recentreMap(this.shipToLat,this.shipToLon);
+			},
 		
 			calcLatLon: function(event) {
 				let newVal=event.target.value;
@@ -929,6 +1009,62 @@ function updateCanvas(elem,code,stringToEncode) {
 		
 		}).mount("#app1");
 
+
+var map = L.map('map').setView([0.00, 0.00], 1);
+
+
+L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+    attribution: '<br/>&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+}).addTo(map);
+
+function to7decimalplaces(val) {
+	if (val > 0) {
+		return Math.floor(1e7*val+0.4999999999)/1e7
+	} else {
+		return Math.ceil(1e7*val-0.4999999999)/1e7
+	}
+}
+
+let mapMarkers=[];
+
+
+function recentreMap(lat,lon,zoom) {
+	let currentZoom=map.getZoom();
+	if (zoom==18) {
+	currentZoom=18;
+	}
+    map.setView(new L.LatLng(lat, lon), currentZoom);
+}
+
+function clearMapMarkers() {
+    for(let i = 0; i < mapMarkers.length; i++){
+    map.removeLayer(mapMarkers[i]);
+    }
+    return mapMarkers.length;
+}
+
+function showPoint(lat,lon) {
+    clearMapMarkers();
+    c = new L.circle([lat,lon], {radius: 0, color: '#FF0000'});
+    c.addTo(map);
+    mapMarkers.push(c);
+    c = new L.circle([lat,lon], {radius: 5, color: '#000000', fillColor: '#000000'});
+    c.addTo(map);
+    mapMarkers.push(c);
+}
+
+map.on('click', function(e) {
+
+	let lat=to7decimalplaces(e.latlng.lat);
+	let lon=to7decimalplaces(e.latlng.lng);
+
+	while (lon> 180) { lon-=360 }
+	while (lon< -180) { lon+=360 }
+	app1.shipToLat=lat
+	app1.shipToLon=lon;
+	recentreMap(lat,lon,1);
+	showPoint(lat,lon);	        
+});
 
 
 </script>
